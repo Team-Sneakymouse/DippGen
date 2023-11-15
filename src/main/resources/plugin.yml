@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://json.schemastore.org/bukkit-plugin
+main: com.danidipp.lom.Plugin
+name: dipp-generate
+version: 1.0
+
+commands:
+    helloWorld:
+        description: Hello, World!
+        usage: /<command>

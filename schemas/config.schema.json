@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "DippGenerate Config",
+  "description": "description",
+  "type": "object",
+  "properties": {
+    "regions": {
+      "description": "List of region configurations",
+      "type": "object",
+      "additionalProperties": {
+        "description": "Permission will be dipp.regions.<region>",
+        "type": "object",
+        "properties": {
+          "blocks": {
+            "description": "List of materials that may be placed in this region",
+            "type": "array",
+            "items": { "$ref": "material.schema.json" }
+          }
+        }
+      } 
+    }
+  }
+}
