@@ -1,185 +1,33 @@
+# yaml-language-server: $schema=../../../schemas/config.schema.json
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Team-Sneakymouse/DippGen/main/schemas/config.schema.json
-
-regions:
-  brightvale:
-    # Should be able to use buckets on powdered snow
+replacements:
+  ore:
     blocks:
-      - SANDSTONE
-      # - SANDSTONE_SLAB
-      # - SANDSTONE_STAIRS
-      # - SANDSTONE_WALL
-      - OCHRE_FROGLIGHT
-      - SEA_LANTERN
-      - BLUE_STAINED_GLASS
-      # - BLUE_STAINED_GLASS_PANE
-      - POWDER_SNOW
-      - POWDER_SNOW_BUCKET
-      - SAND
-      - CYAN_CONCRETE_POWDER
-      # - CYAN_CONCRETE       # concrete powder turns to concrete when next to water
-      - LIGHT_BLUE_CONCRETE
-      - QUARTZ_PILLAR
-      - QUARTZ_BRICKS
-      - WHITE_STAINED_GLASS
-      # - WHITE_STAINED_GLASS_PANE
-      - ICE
-      - PACKED_ICE
-      - CALCITE
-      - AZALEA_LEAVES
-      - LIGHT_GRAY_GLAZED_TERRACOTTA
-      - WHITE_STAINED_GLASS
-      # - WHITE_STAINED_GLASS_PANE
-      - PINK_GLAZED_TERRACOTTA
-  darkvale:
+      - material: RAW_IRON_BLOCK
+        weight: 1
+    minDelay: 5
+    maxDelay: 10
+    coordinates:
+      - -414 68 -317
+      - -412 68 -317
+  flowers:
     blocks:
-      - DARK_OAK_PLANKS
-      # dark oak stuff
-      - GILDED_BLACKSTONE
-      - BLACK_CONCRETE_POWDER
-      - RED_STAINED_GLASS
-      # - RED_STAINED_GLASS_PANE
-      - ANCIENT_DEBRIS
-      - BLACK_WOOL
-      - BLACK_GLAZED_TERRACOTTA
-      - NETHER_BRICKS
-      - DEAD_FIRE_CORAL_BLOCK
-      - RED_NETHER_BRICKS
-      - CHISELED_POLISHED_BLACKSTONE
-      - DARK_OAK_LOG
-      - CRIMSON_NYLIUM
-      - NETHER_WART_BLOCK
-  sticky:
-    blocks:
-      - OAK_LOG
-      - OAK_PLANKS
-      # oak stuff
-      - STRIPPED_OAK_WOOD
-      - OAK_LEAVES
-      - MANGROVE_LEAVES
-      - BEE_NEST # dani smells lololol
-      - RAW_GOLD_BLOCK
-      - GOLD_BLOCK
-      - HONEYCOMB_BLOCK
-      - YELLOW_CONCRETE
-      - END_STONE_BRICKS
-      # - END_STONE_BRICK_SLAB
-      # - END_STONE_BRICK_STAIRS
-      # - END_STONE_BRICK_WALL
-      - YELLOW_GLAZED_TERRACOTTA
-      - OCHRE_FROGLIGHT
-      - STRIPPED_SPRUCE_LOG
-  grove:
-    blocks:
-      - MOSS_BLOCK
-      - PURPUR_BLOCK
-      - GREEN_STAINED_GLASS
-      # - GREEN_STAINED_GLASS_PANE
-      - MOSSY_STONE_BRICKS
-      #  - MOSSY_STONE_BRICK_SLAB
-      #  - MOSSY_STONE_BRICK_STAIRS
-      #  - MOSSY_STONE_BRICK_WALL
-      - DARK_OAK_LEAVES
-      - AZALEA_LEAVES
-      - PEARLESCENT_FROGLIGHT
-      - PURPLE_STAINED_GLASS
-      # - PURPLE_STAINED_GLASS_PANE
-      - BIRCH_LOG
-      - GREEN_CONCRETE
-  moonbay:
-    blocks:
-      - STRIPPED_JUNGLE_LOG
-      - JUNGLE_LEAVES
-      - JUNGLE_PLANKS
-      # jungle stuff
-      - ORANGE_GLAZED_TERRACOTTA
-      - WARPED_PLANKS
-      - ORANGE_GLAZED_TERRACOTTA
-      - RAW_IRON_BLOCK
-      - WHITE_TERRACOTTA
-      - LIGHT_BLUE_GLAZED_TERRACOTTA
-      - CYAN_STAINED_GLASS
-      #  - CYAN_STAINED_GLASS_PANE
-      - LIGHT_BLUE_CONCRETE_POWDER
-      - ORANGE_CONCRETE_POWDER
-      - DEAD_FIRE_CORAL
-  southshire:
-    blocks:
-      - BLUE_WOOL
-      - LIGHT_BLUE_WOOL
-      - STRIPPED_SPRUCE_LOG
-      - SPRUCE_LOG
-      - SPRUCE_PLANKS
-      # spruce stuff
-      - COBBLESTONE
-      - WHITE_WOOL
-      - WHITE_CONCRETE
-      - LIGHT_BLUE_CONCRETE
-      - BLUE_CONCRETE
-  slums:
-    blocks:
-      - STRIPPED_JUNGLE_WOOD # not log?
-      - STRIPPED_SPRUCE_WOOD # not log?
-      - DIRT
-      - DIRT_PATH
-      - SOUL_SAND
-      - SOUL_SOIL
-      - BROWN_WOOL
-      - BROWN_CONCRETE_POWDER
-      - BROWN_CONCRETE
-      - COARSE_DIRT
-      - PODZOL
-      # - MUD
-  dwarven:
-    blocks:
-      - STONE
-      - COBBLESTONE
-      - CHISELED_STONE_BRICKS
-      - STONE_BRICKS
-      # - STONE_BRICK_SLAB
-      # - STONE_BRICK_STAIRS
-      # - STONE_BRICK_WALL
-      - BLACKSTONE
-      - POLISHED_BLACKSTONE_BRICKS
-      # - POLISHED_BLACKSTONE_BRICK_SLAB
-      # - POLISHED_BLACKSTONE_BRICK_STAIRS
-      # - POLISHED_BLACKSTONE_BRICK_WALL
-      - GRAVEL
-      - COPPER_ORE
-      - REDSTONE_ORE
-      - GOLD_ORE
-      - EMERALD_ORE
-      - DIAMOND_ORE
-  brickton:
-    blocks:
-      - BRICKS
-      - RED_CONCRETE
-      - RED_TERRACOTTA
-      - WAXED_OXIDIZED_COPPER
-      - RED_STAINED_GLASS
-      # - RED_STAINED_GLASS_PANE
-      - MANGROVE_PLANKS
-      # mangrove stuff
-  goattown:
-    blocks:
-      - CHERRY_LOG
-      - STRIPPED_CHERRY_LOG
-      - CHERRY_PLANKS
-      # cherry stuff
-      - WHITE_TERRACOTTA
-      - MAGENTA_TERRACOTTA
-      - PINK_STAINED_GLASS
-      # - PINK_STAINED_GLASS_PANE
-      - WHITE_CONCRETE
-      - WHITE_WOOL
-      - WHITE_STAINED_GLASS
-      # - WHITE_STAINED_GLASS_PANE
-      - PINK_GLAZED_TERRACOTTA
-      - PINK_CONCRETE_POWDER
-      - STRIPPED_CRIMSON_STEM
-      - CHERRY_LEAVES
-      - BLUE_WOOL
-      - BLUE_CONCRETE
-      - BLUE_STAINED_GLASS
-      # - BLUE_STAINED_GLASS_PANE
-      - GRASS_BLOCK
-      - CHERRY_SAPLING
+      - material: GRASS
+        weight: 2
+      - material: DANDELION
+        weight: 3
+      - material: POPPY
+        weight: 3
+      - material: ALLIUM
+        weight: 1
+      - material: BLUE_ORCHID
+        weight: 1
+    minDelay: 30
+    maxDelay: 60
+    coordinates:
+      - 4965 61 4997
+      - 4931 61 4928
+      - 4981 61 4984
+      - 4967 61 4969
+      - 4927 61 4987
+      - 4993 61 4993

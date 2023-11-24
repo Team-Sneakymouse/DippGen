@@ -4,20 +4,38 @@
   "description": "description",
   "type": "object",
   "properties": {
-    "regions": {
-      "description": "List of region configurations",
+    "replacements": {
+      "description": "List of blocks that will be replaced when broken",
       "type": "object",
-      "additionalProperties": {
-        "description": "Permission will be dipp.regions.<region>",
-        "type": "object",
-        "properties": {
+      "properties": {
+          "name": {
+            "description": "Name of list group",
+            "type": "string"
+          },
           "blocks": {
-            "description": "List of materials that may be placed in this region",
+            "description": "List of blocks used for replacements",
             "type": "array",
-            "items": { "$ref": "material.schema.json" }
+            "items": {
+              "description": "jasdjas",
+              "type": "object",
+              "properties": {
+                "material": { "$ref": "material.schema.json" },
+                "weight": { "type": "integer", "minimum": 1 }
+              }
+            }
+          },
+          "minDelay": { "type": "number" },
+          "maxDelay": { "type": "number" },
+          "coordinates": {
+            "description": "Coordinates of blocks to replace",
+            "type": "array",
+            "items": {
+              "description": "Format: \"X Y Z\"",
+              "type": "string",
+              "pattern": "^-?\\d+ -?\\d+ -?\\d+$"
+            }
           }
-        }
-      } 
+      }
     }
   }
 }
