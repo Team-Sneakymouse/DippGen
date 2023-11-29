@@ -39,17 +39,16 @@ public class PlotsellCommand implements ICommandImpl {
 
 				ProtectedRegion plotRegion = regions.stream().filter(r -> r.getPriority() == 5).findFirst().orElse(null);
 				if (plotRegion == null) {
-					// sender.sendMessage("error: Not in any plot");
 					return true;
 				}
 
 				if (!plotRegion.getOwners().contains(wgPlayer)) {
-					// sender.sendMessage("error: Plot is not owned by this person");
-					player.chat("/cast error-PlotNotOwned");
+					Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "cast forcecast " + playerName + " error-PlotNotOwned");
 					return true;
 				}
 
 				plotRegion.getOwners().removePlayer(wgPlayer);
+				Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "cast forcecast " + playerName + " success-PlotSell");
 				return true;
 			}
 		};

@@ -40,8 +40,7 @@ public class HandleBlockBreak implements Listener {
                 };
 
                 var bukkitTask = Bukkit.getScheduler().runTaskLater(Plugin.plugin, task, delay);
-                event.getPlayer()
-                        .sendMessage("Scheduling task " + bukkitTask.getTaskId() + " for block " + material.name() + " in " + delay + " ticks");
+                // event.getPlayer().sendMessage("Scheduling task " + bukkitTask.getTaskId() + " for block " + material.name() + " in " + delay + " ticks");
 
             }
         }
