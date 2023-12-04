@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.danidipp.lom.Commands.ICommandImpl;
@@ -21,12 +22,14 @@ import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
 public class Plugin extends JavaPlugin {
-    public static JavaPlugin plugin;
+    public static Plugin plugin;
     public List<Replacement> replacements;
+    public Map<String, BookMeta> recentBooks;
 
     @Override
     public void onEnable() {
         Plugin.plugin = this;
+        this.recentBooks = new HashMap<>();
         getLogger().info("Plugin is Starting!");
 
         this.parseConfig();

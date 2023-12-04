@@ -23,3 +23,6 @@ commands:
         description: Make player sell plot
         permission: dipp.commands.plotsell
         usage: /<command> <player>
+    showbook:
+        description: shows book - not to be used manually
+        usage: /<command> <hashcode>

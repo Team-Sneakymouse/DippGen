@@ -33,7 +33,7 @@ public class RegisterCommand implements ICommandImpl {
 				if (args.length == 0)
 					return false;
 
-				var replacement = ((Plugin) Plugin.plugin).replacements.stream().filter(r -> r.name().equals(args[0])).findAny().orElse(null);
+				var replacement = Plugin.plugin.replacements.stream().filter(r -> r.name().equals(args[0])).findAny().orElse(null);
 				if (replacement == null) {
 					sender.sendMessage("Can't find replacement for \"" + args[0] + "\"");
 					return true;
@@ -46,15 +46,15 @@ public class RegisterCommand implements ICommandImpl {
 						l -> l.getWorld() == target.getWorld() && (l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ()).equals(coordinates))) {
 					replacement.locations().removeIf(l -> l.getWorld() == target.getWorld()
 							&& (l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ()).equals(coordinates));
-					((Plugin) Plugin.plugin).getConfig().set("replacements." + replacement.name(), replacement.toMap());
-					((Plugin) Plugin.plugin).saveConfig();
+					Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+					Plugin.plugin.saveConfig();
 					sender.sendMessage("Removed registration from " + coordinates);
 					return true;
 				}
 
 				replacement.locations().add(target);
-				((Plugin) Plugin.plugin).getConfig().set("replacements." + replacement.name(), replacement.toMap());
-				((Plugin) Plugin.plugin).saveConfig();
+				Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+				Plugin.plugin.saveConfig();
 				target.getBlock().setType(replacement.getRandomMaterial());
 				sender.sendMessage("Added registration to " + coordinates);
 				return true;
@@ -69,7 +69,7 @@ public class RegisterCommand implements ICommandImpl {
 			public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 				if (args.length > 1)
 					return new ArrayList<>();
-				return ((Plugin) Plugin.plugin).replacements.stream().map(r -> r.name()).collect(Collectors.toList());
+				return Plugin.plugin.replacements.stream().map(r -> r.name()).collect(Collectors.toList());
 			}
 		};
 	}

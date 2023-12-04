@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 import org.bukkit.Bukkit;
 
-public class HandleBlockBreak implements Listener {
+public class RequeueOnBlockBreak implements Listener {
 
     // @EventHandler
     // public void onBlockPlaceEvent(BlockPlaceEvent event) {
@@ -24,7 +24,7 @@ public class HandleBlockBreak implements Listener {
     void onBlockBreakEvent(BlockBreakEvent event) {
         // Bukkit.broadcastMessage("BlockBreakEvent " + event.getBlock().getType().name());
 
-        for (var replacement : ((Plugin) Plugin.plugin).replacements) {
+        for (var replacement : Plugin.plugin.replacements) {
             if (replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()))) {
                 // Bukkit.broadcastMessage("Location match: " + event.getBlock().getLocation());
                 var min = replacement.minDelay();
@@ -39,9 +39,7 @@ public class HandleBlockBreak implements Listener {
                     }
                 };
 
-                var bukkitTask = Bukkit.getScheduler().runTaskLater(Plugin.plugin, task, delay);
-                // event.getPlayer().sendMessage("Scheduling task " + bukkitTask.getTaskId() + " for block " + material.name() + " in " + delay + " ticks");
-
+                Bukkit.getScheduler().runTaskLater(Plugin.plugin, task, delay);
             }
         }
     }

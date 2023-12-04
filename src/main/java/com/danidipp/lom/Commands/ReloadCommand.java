@@ -18,7 +18,7 @@ public class ReloadCommand implements ICommandImpl {
 			@Override
 			public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 				Plugin.plugin.reloadConfig();
-				((Plugin) Plugin.plugin).parseConfig();
+				Plugin.plugin.parseConfig();
 				return true;
 			}
 		};
