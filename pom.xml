@@ -4,8 +4,8 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.danidipp.lom</groupId>
-  <artifactId>dipp-generate</artifactId>
+  <groupId>com.danidipp.dippgen</groupId>
+  <artifactId>dippgen</artifactId>
   <version>1.0</version>
 
   <packaging>jar</packaging>
@@ -65,7 +65,7 @@
           <artifactId>maven-antrun-plugin</artifactId>
           <configuration>
               <tasks>
-                  <copy file="target/dipp-generate-1.0.jar" todir="target/plugins"/>
+                  <copy file="target/dippgen-1.0.jar" todir="target/plugins"/>
               </tasks>
           </configuration>
           <executions>

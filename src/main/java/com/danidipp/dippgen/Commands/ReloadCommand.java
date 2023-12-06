@@ -1,11 +1,11 @@
-package com.danidipp.lom.Commands;
+package com.danidipp.dippgen.Commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-import com.danidipp.lom.Plugin;
+import com.danidipp.dippgen.Plugin;
 
 public class ReloadCommand implements ICommandImpl {
 	public String getName() {

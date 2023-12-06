@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/bukkit-plugin
-name: dipp-generate
-main: com.danidipp.lom.Plugin
+name: dippgen
+main: com.danidipp.dippgen.Plugin
 version: 1.0
 api-version: 1.20
 depend:

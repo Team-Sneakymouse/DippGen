@@ -1,4 +1,4 @@
-package com.danidipp.lom.Commands;
+package com.danidipp.dippgen.Commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

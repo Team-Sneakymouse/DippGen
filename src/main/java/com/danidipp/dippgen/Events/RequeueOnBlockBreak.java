@@ -1,11 +1,11 @@
-package com.danidipp.lom.Events;
+package com.danidipp.dippgen.Events;
 
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.EventHandler;
 
-import com.danidipp.lom.Plugin;
+import com.danidipp.dippgen.Plugin;
 
 import java.util.Random;
 import java.util.Timer;

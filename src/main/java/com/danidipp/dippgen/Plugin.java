@@ -1,4 +1,4 @@
-package com.danidipp.lom;
+package com.danidipp.dippgen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,7 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.danidipp.lom.Commands.ICommandImpl;
+import com.danidipp.dippgen.Commands.ICommandImpl;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 
@@ -101,7 +100,7 @@ public class Plugin extends JavaPlugin {
         var count = 0;
         try {
             ClassPath cp = ClassPath.from(Plugin.class.getClassLoader());
-            for (ClassInfo classInfo : cp.getTopLevelClasses("com.danidipp.lom.Commands")) {
+            for (ClassInfo classInfo : cp.getTopLevelClasses("com.danidipp.dippgen.Commands")) {
                 Class<?> commandClass = Class.forName(classInfo.getName());
                 // getLogger().warning("className: " + classInfo.getName());
                 try {
@@ -131,7 +130,7 @@ public class Plugin extends JavaPlugin {
         var count = 0;
         try {
             ClassPath cp = ClassPath.from(Plugin.class.getClassLoader());
-            for (ClassInfo classInfo : cp.getTopLevelClasses("com.danidipp.lom.Events")) {
+            for (ClassInfo classInfo : cp.getTopLevelClasses("com.danidipp.dippgen.Events")) {
                 Class<?> eventClass = Class.forName(classInfo.getName());
                 try {
                     if (Listener.class.isAssignableFrom(eventClass) && !eventClass.isInterface()) {

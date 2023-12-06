@@ -1,4 +1,4 @@
-package com.danidipp.lom.Commands;
+package com.danidipp.dippgen.Commands;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import com.danidipp.lom.Plugin;
+import com.danidipp.dippgen.Plugin;
 
 public class RegisterCommand implements ICommandImpl {
 	public String getName() {

@@ -1,4 +1,4 @@
-package com.danidipp.lom.Commands;
+package com.danidipp.dippgen.Commands;
 
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.danidipp.lom.Plugin;
+import com.danidipp.dippgen.Plugin;
 
 public class ShowBookCommand implements ICommandImpl {
 

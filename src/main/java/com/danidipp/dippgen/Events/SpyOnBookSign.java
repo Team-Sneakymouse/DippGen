@@ -1,4 +1,4 @@
-package com.danidipp.lom.Events;
+package com.danidipp.dippgen.Events;
 
 import java.util.TimerTask;
 
@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerEditBookEvent;
 
-import com.danidipp.lom.Plugin;
+import com.danidipp.dippgen.Plugin;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;

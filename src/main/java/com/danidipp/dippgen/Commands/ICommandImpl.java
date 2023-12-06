@@ -1,4 +1,4 @@
-package com.danidipp.lom.Commands;
+package com.danidipp.dippgen.Commands;
 
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;

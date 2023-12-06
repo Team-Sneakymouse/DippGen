@@ -1,4 +1,4 @@
-package com.danidipp.lom.Events;
+package com.danidipp.dippgen.Events;
 
 import java.util.List;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.danidipp.lom;
+package com.danidipp.dippgen;
 
 import java.util.HashMap;
 import java.util.List;
