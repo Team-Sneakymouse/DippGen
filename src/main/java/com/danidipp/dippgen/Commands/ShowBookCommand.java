@@ -1,8 +1,5 @@
 package com.danidipp.dippgen.Commands;
 
-import java.util.Map;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

@@ -2,14 +2,12 @@ package com.danidipp.dippgen.Events;
 
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import com.danidipp.dippgen.Plugin;
 
 import java.util.Random;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.bukkit.Bukkit;

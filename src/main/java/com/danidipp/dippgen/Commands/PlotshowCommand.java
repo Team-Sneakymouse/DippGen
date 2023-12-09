@@ -1,7 +1,8 @@
 package com.danidipp.dippgen.Commands;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -12,15 +13,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import com.danidipp.dippgen.Plugin;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -44,16 +40,11 @@ public class PlotshowCommand implements ICommandImpl {
 				}
 
 				String playerName = args[0];
-				OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+				OfflinePlayer player = List.of(Bukkit.getOfflinePlayers()).stream()
+						.filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase())).findFirst().orElse(null);
 
 				if (player == null) {
 					sender.sendMessage("error: Player " + playerName + " does not exist");
-					return true;
-				}
-
-				//abort if player was never on the server
-				if (!player.hasPlayedBefore()) {
-					sender.sendMessage("error: Player " + playerName + " has never played on this server");
 					return true;
 				}
 
@@ -106,6 +97,13 @@ public class PlotshowCommand implements ICommandImpl {
 
 	@Override
 	public TabCompleter getTabCompleter() {
-		return null;
+		return new TabCompleter() {
+			@Override
+			public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+				var playerlist = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().startsWith(args[0].toLowerCase()))
+						.map(p -> p.getName()).collect(Collectors.toList());
+				return playerlist;
+			}
+		};
 	}
 }
