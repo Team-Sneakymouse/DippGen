@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemorySection;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,11 +24,13 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 public class Plugin extends JavaPlugin {
     public static Plugin plugin;
     public List<Replacement> replacements;
+    public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
 
     @Override
     public void onEnable() {
         Plugin.plugin = this;
+        this.replacementRegistrationEnabled = new HashMap<>();
         this.recentBooks = new HashMap<>();
         getLogger().info("Plugin is Starting!");
 
@@ -40,6 +43,21 @@ public class Plugin extends JavaPlugin {
         count = this.registerEvents();
         getLogger().info("Registered " + count + " events!");
 
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (var replacement : plugin.replacements) {
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            for (var location : replacement.locations()) {
+                                location.getBlock().setType(replacement.getRandomMaterial());
+                            }
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override

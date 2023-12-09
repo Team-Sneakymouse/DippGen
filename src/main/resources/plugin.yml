@@ -7,13 +7,9 @@ depend:
     - WorldGuard
 
 commands:
-    register:
-        description: Registers new location
-        # permission: dipp.commands.register
-        usage: /<command> <list>
     reload:
         description: Reloads config
-        # permission: dipp.commands.reload
+        permission: dipp.commands.reload
         usage: /<command>
     plotbuy:
         description: Make player buy plot
@@ -26,3 +22,7 @@ commands:
     showbook:
         description: shows book - not to be used manually
         usage: /<command> <hashcode>
+    plotshow:
+        description: Displays plot info of player
+        permission: dipp.commands.plotshow
+        usage: /<command> <player>

@@ -5,9 +5,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.checkerframework.checker.units.qual.radians;
 
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.config.WorldConfiguration;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
@@ -37,6 +42,11 @@ public class PlotbuyCommand implements ICommandImpl {
 				RegionQuery query = container.createQuery();
 				var regions = query.getApplicableRegions(wgPlayer.getLocation()).getRegions();
 
+				if (atPlotLimit(wgPlayer)) {
+					Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), "cast forcecast " + playerName + " error-PlotOwned");
+					return true;
+				}
+
 				ProtectedRegion plotRegion = regions.stream().filter(r -> r.getPriority() == 5).findFirst().orElse(null);
 				if (plotRegion == null) {
 					return true;
@@ -53,6 +63,16 @@ public class PlotbuyCommand implements ICommandImpl {
 				return true;
 			}
 		};
+	}
+
+	boolean atPlotLimit(LocalPlayer wgPlayer) {
+		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		WorldConfiguration wcfg = WorldGuard.getInstance().getPlatform().getGlobalStateManager().get(wgPlayer.getWorld());
+		RegionManager manager = container.get(wgPlayer.getWorld());
+		var maxRegionCount = wcfg.getMaxRegionCount(wgPlayer);
+		var ownedRegions = manager.getRegionCountOfPlayer(wgPlayer);
+
+		return maxRegionCount >= 0 && ownedRegions >= maxRegionCount;
 	}
 
 	@Override

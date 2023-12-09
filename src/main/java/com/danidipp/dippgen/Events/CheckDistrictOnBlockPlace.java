@@ -19,21 +19,50 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class CheckDistrictOnBlockPlace implements Listener {
 
 	@EventHandler
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
-		for (var region : getRegions(event.getBlock().getLocation())) {
-			var permission = "dipp.placeblock." + region.getId() + "." + event.getBlockPlaced().getType().name().toLowerCase();
+		if (player.hasPermission("dipp.admin"))
+			return;
+
+		var regions = getRegions(event.getBlock().getLocation());
+		var topRegionIsolatePermission = "dipp." + regions.getFirst().getId() + ".isolate";
+		if (regions.getFirst().getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
+			// Player is not in a plot
+			if (player.hasPermission("dipp.debug")) {
+				var error = new TextComponent("Region " + regions.getFirst().getId() + " is not isolated.");
+				error.setColor(ChatColor.RED);
+				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
+			}
+			event.setCancelled(true);
+			return;
+		}
+
+		for (var region : regions) {
+			var permission = "dipp." + region.getId() + ".place." + event.getBlockPlaced().getType().name().toLowerCase();
 			if (player.hasPermission(permission)) { // allow event to go through
+				if (player.hasPermission("dipp.debug"))
+					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(permission));
 				return;
 			}
 
-			var isolatedPermission = "dipp.#isolated." + region.getId();
+			var isolatedPermission = "dipp." + region.getId() + ".isolate";
 			if (player.hasPermission(isolatedPermission)) {
 				break;
 			}
+		}
+
+		if (player.hasPermission("dipp.debug")) {
+			var regionNames = regions.stream().map(r -> r.getId()).collect(Collectors.joining(", "));
+			var error = new TextComponent("No permission to place " + event.getBlockPlaced().getType().name() + " in " + regionNames);
+			error.setColor(ChatColor.RED);
+			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 		}
 		event.setCancelled(true);
 	}
@@ -41,16 +70,38 @@ public class CheckDistrictOnBlockPlace implements Listener {
 	@EventHandler
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 		Player player = event.getPlayer();
-		for (var region : getRegions(event.getBlock().getLocation())) {
-			var permission = "dipp.breakblock." + region.getId() + "." + event.getBlock().getType().name().toLowerCase();
+		if (player.hasPermission("dipp.admin"))
+			return;
+
+		var regions = getRegions(event.getBlock().getLocation());
+		var topRegionIsolatePermission = "dipp." + regions.getFirst().getId() + ".isolate";
+		if (regions.getFirst().getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
+			// Player is not in a plot
+			if (player.hasPermission("dipp.debug")) {
+				var error = new TextComponent("Region " + regions.getFirst().getId() + " is not isolated.");
+				error.setColor(ChatColor.RED);
+				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
+			}
+			event.setCancelled(true);
+			return;
+		}
+
+		for (var region : regions) {
+			var permission = "dipp." + region.getId() + ".break." + event.getBlock().getType().name().toLowerCase();
 			if (player.hasPermission(permission)) { // allow event to go through
 				return;
 			}
 
-			var isolatedPermission = "dipp.#isolated." + region.getId();
+			var isolatedPermission = "dipp." + region.getId() + ".isolate";
 			if (player.hasPermission(isolatedPermission)) {
 				break;
 			}
+		}
+		if (player.hasPermission("dipp.debug")) {
+			var regionNames = regions.stream().map(r -> r.getId()).collect(Collectors.joining(", "));
+			var error = new TextComponent("No permission to place " + event.getBlock().getType().name() + " in " + regionNames);
+			error.setColor(ChatColor.RED);
+			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 		}
 		event.setCancelled(true);
 	}

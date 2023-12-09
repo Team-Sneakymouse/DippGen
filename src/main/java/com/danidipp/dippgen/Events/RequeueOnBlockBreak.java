@@ -4,6 +4,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 import com.danidipp.dippgen.Plugin;
 
@@ -20,10 +21,11 @@ public class RequeueOnBlockBreak implements Listener {
     //     Bukkit.broadcastMessage("BlockPlaceEvent " + event.getBlock().getType().name());
     // }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     void onBlockBreakEvent(BlockBreakEvent event) {
         // Bukkit.broadcastMessage("BlockBreakEvent " + event.getBlock().getType().name());
-
+        if (event.isCancelled())
+            return;
         for (var replacement : Plugin.plugin.replacements) {
             if (replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()))) {
                 // Bukkit.broadcastMessage("Location match: " + event.getBlock().getLocation());
