@@ -37,7 +37,7 @@ public class CheckDistrictOnBlockPlace implements Listener {
 				return;
 			} else {
 				if (player.hasPermission("dipp.debug")) {
-					var error = new TextComponent("Explicit exception override: " + exceptionPermission);
+					var error = new TextComponent("[PLACE] Explicit exception override: " + exceptionPermission);
 					error.setColor(ChatColor.RED);
 					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(error));
 				}
@@ -51,7 +51,7 @@ public class CheckDistrictOnBlockPlace implements Listener {
 		if (regions.get(0).getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
 			// Player is not in a plot
 			if (player.hasPermission("dipp.debug")) {
-				var error = new TextComponent("Region " + regions.get(0).getId() + " is not isolated.");
+				var error = new TextComponent("[PLACE] Region " + regions.get(0).getId() + " is not isolated.");
 				error.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 			}
@@ -77,7 +77,7 @@ public class CheckDistrictOnBlockPlace implements Listener {
 
 		if (player.hasPermission("dipp.debug")) {
 			var error = new TextComponent(
-					"No permission to place " + event.getBlockPlaced().getType().name() + " in " + String.join(",", checkedRegions));
+					"[PLACE] No permission to place " + event.getBlockPlaced().getType().name() + " in " + String.join(",", checkedRegions));
 			error.setColor(ChatColor.RED);
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 		}
@@ -98,7 +98,7 @@ public class CheckDistrictOnBlockPlace implements Listener {
 				return;
 			} else {
 				if (player.hasPermission("dipp.debug")) {
-					var error = new TextComponent("Explicit exception override: " + exceptionPermission);
+					var error = new TextComponent("[BREAK] Explicit exception override: " + exceptionPermission);
 					error.setColor(ChatColor.RED);
 					player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(error));
 				}
@@ -112,7 +112,7 @@ public class CheckDistrictOnBlockPlace implements Listener {
 		if (regions.get(0).getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
 			// Player is not in a plot
 			if (player.hasPermission("dipp.debug")) {
-				var error = new TextComponent("Region " + regions.get(0).getId() + " is not isolated.");
+				var error = new TextComponent("[BREAK] Region " + regions.get(0).getId() + " is not isolated.");
 				error.setColor(ChatColor.RED);
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 			}
@@ -136,7 +136,8 @@ public class CheckDistrictOnBlockPlace implements Listener {
 			}
 		}
 		if (player.hasPermission("dipp.debug")) {
-			var error = new TextComponent("No permission to break " + event.getBlock().getType().name() + " in " + String.join(",", checkedRegions));
+			var error = new TextComponent(
+					"[BREAK] No permission to break " + event.getBlock().getType().name() + " in " + String.join(",", checkedRegions));
 			error.setColor(ChatColor.RED);
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
 		}

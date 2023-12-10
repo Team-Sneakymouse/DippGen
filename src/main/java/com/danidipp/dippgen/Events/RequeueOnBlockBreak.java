@@ -25,17 +25,20 @@ public class RequeueOnBlockBreak implements Listener {
         if (event.isCancelled())
             return;
         for (var replacement : Plugin.plugin.replacements) {
-            if (replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()))) {
+            var matchesLocation = replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()));
+            var matchesGlobalType = replacement.name().startsWith("global_")
+                    && replacement.blocks().stream().anyMatch(b -> b.material().equals(event.getBlock().getType()));
+            if (matchesLocation || matchesGlobalType) {
                 // Bukkit.broadcastMessage("Location match: " + event.getBlock().getLocation());
                 var min = replacement.minDelay();
                 var max = replacement.maxDelay();
                 var delay = min == max ? min : new Random().nextLong(max - min) + min;
-                var material = replacement.getRandomMaterial();
+                var newMaterial = replacement.getRandomMaterial();
 
                 TimerTask task = new TimerTask() {
                     public void run() {
                         Plugin.plugin.getLogger().warning("Ran task");
-                        event.getBlock().setType(material);
+                        event.getBlock().setType(newMaterial);
                     }
                 };
 

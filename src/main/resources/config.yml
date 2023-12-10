@@ -10,24 +10,58 @@ replacements:
     coordinates:
       - -414 68 -317
       - -412 68 -317
-  flowers:
+  global_flowers:
     blocks:
       - material: GRASS
         weight: 2
+      - material: FERN
+        weight: 3
+      - material: DEAD_BUSH
+        weight: 3
       - material: DANDELION
-        weight: 3
+        weight: 1
       - material: POPPY
-        weight: 3
-      - material: ALLIUM
         weight: 1
       - material: BLUE_ORCHID
         weight: 1
+      - material: ALLIUM
+        weight: 1
+      - material: AZURE_BLUET
+        weight: 1
+      - material: RED_TULIP
+        weight: 1
+      - material: ORANGE_TULIP
+        weight: 1
+      - material: WHITE_TULIP
+        weight: 1
+      - material: PINK_TULIP
+        weight: 1
+      - material: OXEYE_DAISY
+        weight: 1
+      - material: CORNFLOWER
+        weight: 1
+      - material: LILY_OF_THE_VALLEY
+        weight: 1
+      - material: TORCHFLOWER
+        weight: 1
+      # - material: WITHER_ROSE
+      #   weight: 1
+      # - material: PINK_PETALS
+      #   weight: 1
+      - material: TALL_GRASS
+        weight: 1
+      - material: LARGE_FERN
+        weight: 1
+      - material: SUNFLOWER
+        weight: 1
+      - material: LILAC
+        weight: 1
+      - material: ROSE_BUSH
+        weight: 1
+      - material: PEONY
+        weight: 1
+      - material: PITCHER_PLANT
+        weight: 2
     minDelay: 30
     maxDelay: 60
-    coordinates:
-      - 4965 61 4997
-      - 4931 61 4928
-      - 4981 61 4984
-      - 4967 61 4969
-      - 4927 61 4987
-      - 4993 61 4993
+    coordinates: []
