@@ -2,6 +2,7 @@ package com.danidipp.dippgen.Commands;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -40,8 +41,14 @@ public class PlotshowCommand implements ICommandImpl {
 				}
 
 				String playerName = args[0];
-				OfflinePlayer player = List.of(Bukkit.getOfflinePlayers()).stream()
-						.filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase())).findFirst().orElse(null);
+				OfflinePlayer player;
+				try {
+					var uuid = UUID.fromString(playerName);
+					player = Bukkit.getOfflinePlayer(uuid);
+				} catch (IllegalArgumentException e) {
+					player = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase()))
+							.findFirst().orElse(null);
+				}
 
 				if (player == null) {
 					sender.sendMessage("error: Player " + playerName + " does not exist");
@@ -55,7 +62,8 @@ public class PlotshowCommand implements ICommandImpl {
 				Collection<ProtectedRegion> regions = regionContainer.get(wgWorld).getRegions().values();
 
 				// Filter regions by owner
-				regions = regions.stream().filter(r -> r.getOwners().contains(player.getUniqueId())).toList();
+				var uuid = player.getUniqueId();
+				regions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
 
 				// Display regions
 				sender.sendMessage(playerName + " owns " + regions.size() + " plots:");

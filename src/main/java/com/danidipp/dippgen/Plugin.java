@@ -18,14 +18,30 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.danidipp.dippgen.Commands.ICommandImpl;
+import com.danidipp.dippgen.Modules.PlotManagement.Plot;
+import com.danidipp.dippgen.Modules.PlotManagement.PlotClaimGUI;
+import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed;
+import com.danidipp.dippgen.Modules.PlotManagement.PlotManagementGUI;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
 public class Plugin extends JavaPlugin {
     public static Plugin plugin;
     public List<Replacement> replacements;
     public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
+
+    @Override
+    public void onLoad() {
+        getLogger().info("Plugin is Loading!");
+        WorldGuard worldGuard = WorldGuard.getInstance();
+        FlagRegistry flagRegistry = worldGuard.getFlagRegistry();
+
+        flagRegistry.register(Plot.maxMembersFlag);
+        flagRegistry.register(Plot.plotUnlockedFlag);
+    }
 
     @Override
     public void onEnable() {
@@ -41,6 +57,10 @@ public class Plugin extends JavaPlugin {
         getLogger().info("Registered " + count + "commands!");
 
         count = this.registerEvents();
+        this.getServer().getPluginManager().registerEvents(PlotDeed.listener, this);
+        this.getServer().getPluginManager().registerEvents(PlotClaimGUI.listener, this);
+        this.getServer().getPluginManager().registerEvents(PlotManagementGUI.listener, this);
+        count += 3;
         getLogger().info("Registered " + count + " events!");
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {

@@ -47,6 +47,15 @@ public class CheckDistrictOnBlockPlace implements Listener {
 		}
 
 		var regions = getRegions(event.getBlock().getLocation());
+		if (regions.size() == 0) {
+			if (player.hasPermission("dipp.debug")) {
+				var error = new TextComponent("[PLACE] No regions found.");
+				error.setColor(ChatColor.RED);
+				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
+			}
+			event.setCancelled(true);
+			return;
+		}
 		var topRegionIsolatePermission = "dipp." + regions.get(0).getId() + ".isolate";
 		if (regions.get(0).getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
 			// Player is not in a plot
@@ -108,6 +117,15 @@ public class CheckDistrictOnBlockPlace implements Listener {
 		}
 
 		var regions = getRegions(event.getBlock().getLocation());
+		if (regions.size() == 0) {
+			if (player.hasPermission("dipp.debug")) {
+				var error = new TextComponent("[BREAK] No regions found.");
+				error.setColor(ChatColor.RED);
+				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, error);
+			}
+			event.setCancelled(true);
+			return;
+		}
 		var topRegionIsolatePermission = "dipp." + regions.get(0).getId() + ".isolate";
 		if (regions.get(0).getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
 			// Player is not in a plot

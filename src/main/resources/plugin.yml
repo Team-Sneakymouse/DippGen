@@ -11,6 +11,10 @@ commands:
         description: Reloads config
         permission: dipp.commands.reload
         usage: /<command>
+    plot:
+        description: Open plot management GUI for player
+        permission: dipp.commands.plot
+        usage: /<command> <player>
     plotbuy:
         description: Make player buy plot
         permission: dipp.commands.plotbuy
@@ -26,3 +30,6 @@ commands:
         description: Displays plot info of player
         permission: dipp.commands.plotshow
         usage: /<command> <player>
+    deed:
+        description: Give deed of current plot to player
+        usage: /<command>
