@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import com.danidipp.dippgen.Plugin;
+import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 
 import java.util.Random;
 import java.util.TimerTask;
@@ -27,7 +28,8 @@ public class RequeueOnBlockBreak implements Listener {
         for (var replacement : Plugin.plugin.replacements) {
             var matchesLocation = replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()));
             var matchesGlobalType = replacement.name().startsWith("global_")
-                    && replacement.blocks().stream().anyMatch(b -> b.material().equals(event.getBlock().getType()));
+                    && replacement.blocks().stream().anyMatch(b -> b.material().equals(event.getBlock().getType()))
+                    && Plot.getPlot(event.getBlock().getLocation()) == null;
             if (matchesLocation || matchesGlobalType) {
                 // Bukkit.broadcastMessage("Location match: " + event.getBlock().getLocation());
                 var min = replacement.minDelay();
