@@ -45,7 +45,7 @@ public class SpyOnBookSign implements Listener {
 		bookText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Plugin.plugin.getName() + ":showbook " + bookId));
 
 		var text = new TextComponent();
-		text.addExtra(ChatColor.AQUA + "[DIPP] ");
+		text.addExtra(Plugin.LOG_PREFIX);
 		text.addExtra(playerText);
 		text.addExtra(" signed book ");
 		text.addExtra(bookText);

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
@@ -32,6 +33,8 @@ public class Plugin extends JavaPlugin {
     public List<Replacement> replacements;
     public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
+
+    public static String LOG_PREFIX = ChatColor.GRAY + "[" + ChatColor.AQUA + "DIPP" + ChatColor.GRAY + "] " + ChatColor.RESET;
 
     @Override
     public void onLoad() {
