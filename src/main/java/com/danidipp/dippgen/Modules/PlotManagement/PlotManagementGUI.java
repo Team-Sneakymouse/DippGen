@@ -35,7 +35,8 @@ public class PlotManagementGUI {
 		var inventory = Bukkit.createInventory(PlotManagementGUI.plotManagementInventoryHolder, 2 * 9, "§6Plot Management: " + plotName);
 		inventory.setItem(0, IconUtil.plotOwner(plot));
 		inventory.setItem(1, IconUtil.plotInfo(plot));
-		// inventory.setItem(8, IconUtil.lockToggle(plot));
+		// inventory.setItem(7, IconUtil.lockToggle(plot));
+		inventory.setItem(8, IconUtil.abandonPlot(plot));
 
 		var uuids = plot.region().getMembers().getUniqueIds().stream().toList();
 		for (var i = 0; i < uuids.size(); i++) {
@@ -72,8 +73,12 @@ public class PlotManagementGUI {
 				return;
 			}
 
-			if (slot == 8) {
+			if (slot == 7) {
 				this.toggleLock(event, plot);
+				return;
+			}
+			if (slot == 8) {
+				this.abandonPlot(event, plot);
 				return;
 			}
 			if (item.getType() == Material.PLAYER_HEAD && slot >= 9) {
@@ -94,6 +99,24 @@ public class PlotManagementGUI {
 			plot.region().setFlag(Plot.plotUnlockedFlag, !isUnlocked);
 
 			event.getClickedInventory().setItem(8, IconUtil.lockToggle(plot));
+		}
+
+		void abandonPlot(InventoryClickEvent event, Plot plot) {
+			if (!(event.getWhoClicked() instanceof Player)) {
+				event.getWhoClicked().sendMessage("what are you??");
+				return;
+			}
+			var player = (Player) event.getWhoClicked();
+
+			plot.region().getMembers().removeAll();
+			plot.region().getOwners().removeAll();
+			plot.region().setFlag(Plot.maxMembersFlag, 1);
+			plot.region().setFlag(Plot.teleportLocationFlag, null);
+			plot.region().setFlag(Plot.plotUnlockedFlag, false);
+
+			player.getInventory().setItemInMainHand(null);
+			player.playSound(player, "lom:light.buff2", 0.5f, 1.0f);
+			Bukkit.getScheduler().runTask(Plugin.plugin, () -> player.closeInventory());
 		}
 
 		void addMember(InventoryClickEvent event, Plot plot) {
@@ -193,6 +216,17 @@ class IconUtil {
 		meta.setDisplayName(toggleName);
 		meta.setLore(toggleLore);
 		meta.setCustomModelData(lock ? 235 : 234);
+		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	static ItemStack abandonPlot(Plot plot) {
+		var item = new ItemStack(Material.BARRIER);
+		var meta = item.getItemMeta();
+
+		meta.setDisplayName("§cAbandon Plot");
+		meta.setLore(List.of("§eClick to abandon this plot", "§7This will remove all members and", "§7make the plot available for purchase."));
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		item.setItemMeta(meta);
 		return item;

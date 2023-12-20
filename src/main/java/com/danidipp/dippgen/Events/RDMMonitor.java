@@ -33,8 +33,8 @@ public class RDMMonitor implements Listener {
 
 		var locationText = new TextComponent(ChatColor.YELLOW + "[TP]");
 		locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to death position")));
-		locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + killer.getName() + " "
-				+ victim.getLocation().getBlockX() + " " + victim.getLocation().getBlockY() + " " + victim.getLocation().getBlockZ()));
+		locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + victim.getLocation().getBlockX() + " "
+				+ victim.getLocation().getBlockY() + " " + victim.getLocation().getBlockZ()));
 
 		var text = new TextComponent();
 		text.addExtra(Plugin.LOG_PREFIX);
