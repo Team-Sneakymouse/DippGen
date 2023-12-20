@@ -112,17 +112,18 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 						.orElse(null);
 				var deedDistrict = District.districts.stream().filter(d -> d.deed().name.equals(item.getItemMeta().getDisplayName())).findFirst()
 						.orElse(null);
-				if (plotDistrict == null || deedDistrict == null || plotDistrict != deedDistrict) {
+				if (plotDistrict == null || deedDistrict == null) {
 					player.sendMessage("error: You can't use this deed here");
 					return;
 				}
 
 				if (plot.region().getOwners().size() > 0) {
-					if (player.hasPermission("dipp.admin")) {
-						player.openInventory(PlotManagementGUI.create(plot, player));
-						break;
-					}
 					player.sendMessage("error: This plot is already claimed");
+					return;
+				}
+
+				if (plotDistrict != deedDistrict) {
+					player.sendMessage("error: This deed is not for this district");
 					return;
 				}
 				player.openInventory(PlotClaimGUI.create(plot, player));
