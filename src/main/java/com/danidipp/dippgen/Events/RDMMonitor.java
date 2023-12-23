@@ -25,24 +25,24 @@ public class RDMMonitor implements Listener {
 		var victim = event.getEntity();
 
 		var deathMessage = event.getDeathMessage();
-		deathMessage = deathMessage.replaceAll("\\[playerDisplayName\\]", victim.getDisplayName());
-		deathMessage = deathMessage.replaceAll("\\[sourceDisplayName\\]", killer.getDisplayName());
-		if (deathMessage.contains("[item]")) {
-			var item = victim.getInventory().getItemInMainHand();
-			if (item != null && item.getType() != Material.AIR) {
-				String itemName;
-				if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-					itemName = item.getItemMeta().getDisplayName();
-				} else {
-					itemName = item.getType().name().toLowerCase().replaceAll("_", " ");
-				}
+		// deathMessage = deathMessage.replaceAll("\\[playerDisplayName\\]", victim.getDisplayName());
+		// deathMessage = deathMessage.replaceAll("\\[sourceDisplayName\\]", killer.getDisplayName());
+		// if (deathMessage.contains("[item]")) {
+		// 	var item = victim.getInventory().getItemInMainHand();
+		// 	if (item != null && item.getType() != Material.AIR) {
+		// 		String itemName;
+		// 		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+		// 			itemName = item.getItemMeta().getDisplayName();
+		// 		} else {
+		// 			itemName = item.getType().name().toLowerCase().replaceAll("_", " ");
+		// 		}
 
-				deathMessage = deathMessage.replaceAll("\\[item\\]", itemName);
-			} else {
-				deathMessage = deathMessage.replaceAll("\\[item\\]", "fists");
-			}
-		}
-		deathMessage = deathMessage.replace("was slain by", "was killed by");
+		// 		deathMessage = deathMessage.replaceAll("\\[item\\]", itemName);
+		// 	} else {
+		// 		deathMessage = deathMessage.replaceAll("\\[item\\]", "fists");
+		// 	}
+		// }
+
 		var deathText = new Text(ChatColor.translateAlternateColorCodes('&', deathMessage));
 		var deathHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, deathText);
 

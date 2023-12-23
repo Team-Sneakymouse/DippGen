@@ -51,7 +51,7 @@ public class ReplacementRegistration implements Listener {
 	@EventHandler
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		var item = event.getItemInHand();
-		if (item == null || !item.getItemMeta().hasDisplayName())
+		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName())
 			return;
 		var nameParts = item.getItemMeta().getDisplayName().split(":");
 		if (nameParts.length != 2 || !nameParts[0].equals("dipp"))
