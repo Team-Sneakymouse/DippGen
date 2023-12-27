@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.danidipp.dippgen.Commands.ICommandImpl;
+import com.danidipp.dippgen.Events.BreedAnimalsFlag;
 import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 import com.danidipp.dippgen.Modules.PlotManagement.PlotClaimGUI;
 import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed;
@@ -44,6 +45,8 @@ public class Plugin extends JavaPlugin {
 
         flagRegistry.register(Plot.maxMembersFlag);
         flagRegistry.register(Plot.plotUnlockedFlag);
+        flagRegistry.register(Plot.teleportLocationFlag);
+        flagRegistry.register(BreedAnimalsFlag.breedAnimalsFlag);
     }
 
     @Override
