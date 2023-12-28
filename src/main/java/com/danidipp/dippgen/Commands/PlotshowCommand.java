@@ -63,44 +63,55 @@ public class PlotshowCommand implements ICommandImpl {
 
 				// Filter regions by owner
 				var uuid = player.getUniqueId();
-				regions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
+				var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
+				var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
 
 				// Display regions
-				sender.sendMessage(playerName + " owns " + regions.size() + " plots:");
-				for (var region : regions) {
-					var regionCenter = region.getMinimumPoint().add(region.getMaximumPoint()).divide(2);
-					var centerY = region.getMaximumPoint().getBlockY();
-					while (world.getBlockAt(regionCenter.getBlockX(), centerY, regionCenter.getBlockZ()).isPassable()) {
-						centerY--;
-					}
-					regionCenter = regionCenter.withY(centerY + 1);
-
-					var infoComponent = new TextComponent("[info]");
-					infoComponent.setColor(ChatColor.YELLOW);
-					infoComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show plot info")));
-					infoComponent
-							.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rg info -w " + world.getName() + " " + region.getId()));
-
-					var teleportComponent = new TextComponent("[tp]");
-					teleportComponent.setColor(ChatColor.YELLOW);
-					teleportComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to plot")));
-					teleportComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-							"/minecraft:tp @s " + regionCenter.getBlockX() + " " + regionCenter.getBlockY() + " " + regionCenter.getBlockZ()));
-
-					var text = new TextComponent("- " + region.getId() + " ");
-					text.addExtra(infoComponent);
-
-					if (sender instanceof Player) {
-						text.addExtra(" ");
-						text.addExtra(teleportComponent);
-					}
-
+				sender.sendMessage(playerName + " owns " + ownerRegions.size() + " plots:");
+				for (var region : ownerRegions) {
+					var text = formatRegion(region, world);
 					sender.spigot().sendMessage(text);
+				}
+
+				if (memberRegions.size() > 0) {
+					sender.sendMessage(playerName + " is a member of " + memberRegions.size() + " plots:");
+					for (var region : memberRegions) {
+						var text = formatRegion(region, world);
+						sender.spigot().sendMessage(text);
+					}
 				}
 
 				return true;
 			}
 		};
+	}
+
+	TextComponent formatRegion(ProtectedRegion region, World world) {
+		var regionCenter = region.getMinimumPoint().add(region.getMaximumPoint()).divide(2);
+		var centerY = region.getMaximumPoint().getBlockY();
+		while (world.getBlockAt(regionCenter.getBlockX(), centerY, regionCenter.getBlockZ()).isPassable()) {
+			centerY--;
+		}
+		regionCenter = regionCenter.withY(centerY + 1);
+
+		var infoComponent = new TextComponent("[info]");
+		infoComponent.setColor(ChatColor.YELLOW);
+		infoComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show plot info")));
+		infoComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rg info -w " + world.getName() + " " + region.getId()));
+
+		var teleportComponent = new TextComponent("[tp]");
+		teleportComponent.setColor(ChatColor.YELLOW);
+		teleportComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to plot")));
+		teleportComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+				"/minecraft:tp @s " + regionCenter.getBlockX() + " " + regionCenter.getBlockY() + " " + regionCenter.getBlockZ()));
+
+		var text = new TextComponent("- " + region.getId() + " ");
+		text.addExtra(infoComponent);
+
+		text.addExtra(" ");
+		text.addExtra(teleportComponent);
+
+		return text;
 	}
 
 	@Override

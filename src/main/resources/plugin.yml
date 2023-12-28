@@ -15,14 +15,6 @@ commands:
         description: Open plot management GUI for player
         permission: dipp.commands.plot
         usage: /<command> <player>
-    plotbuy:
-        description: Make player buy plot
-        permission: dipp.commands.plotbuy
-        usage: /<command> <player>
-    plotsell:
-        description: Make player sell plot
-        permission: dipp.commands.plotsell
-        usage: /<command> <player>
     showbook:
         description: shows book - not to be used manually
         usage: /<command> <hashcode>
