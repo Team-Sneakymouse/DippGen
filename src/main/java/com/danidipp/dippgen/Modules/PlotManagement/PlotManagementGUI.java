@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
@@ -156,10 +157,20 @@ public class PlotManagementGUI {
 			var bossbarCommand = "cmi bossbarmsg " + player.getName() + " -cancel:addmember-" + info.plot().getId();
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), bossbarCommand);
 
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), getPositionalPlaySoundCommand("lom:cute.hit", player, target.getLocation()));
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), getPositionalPlaySoundCommand("lom:cute.hit", target, player.getLocation()));
+
 			info.plot().region().getMembers().addPlayer(target.getUniqueId());
 			player.openInventory(PlotManagementGUI.create(info.plot(), player));
 		}
 
+		String getPositionalPlaySoundCommand(String sound, Player listener, Location location) {
+			var playerName = listener.getName();
+			var x = location.getX();
+			var y = location.getY();
+			var z = location.getZ();
+			return "playsound " + sound + " master " + playerName + " " + x + " " + y + " " + z;
+		}
 	};
 }
 
