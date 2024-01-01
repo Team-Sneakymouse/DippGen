@@ -78,7 +78,11 @@ public class Plugin extends JavaPlugin {
                         public void run() {
                             for (var location : replacement.locations()) {
                                 location.getBlock().setType(replacement.getRandomMaterial());
+                                if (replacement.name().startsWith("global_"))
+                                    replacement.locations().remove(location);
                             }
+                            Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+                            Plugin.plugin.saveConfig();
                         }
                     });
                 }

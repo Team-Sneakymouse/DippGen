@@ -10,6 +10,7 @@ import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 
 import java.util.Random;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 
@@ -37,10 +38,21 @@ public class RequeueOnBlockBreak implements Listener {
                 var delay = min == max ? min : new Random().nextLong(max - min) + min;
                 var newMaterial = replacement.getRandomMaterial();
 
+                if (matchesGlobalType) {
+                    replacement.locations().add(event.getBlock().getLocation());
+                    Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+                    Plugin.plugin.saveConfig();
+                }
+
                 TimerTask task = new TimerTask() {
                     public void run() {
-                        Plugin.plugin.getLogger().warning("Ran task");
+                        Plugin.plugin.getLogger().log(Level.FINE, "Ran task");
                         event.getBlock().setType(newMaterial);
+                        if (matchesGlobalType) {
+                            replacement.locations().remove(event.getBlock().getLocation());
+                            Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+                            Plugin.plugin.saveConfig();
+                        }
                     }
                 };
 
