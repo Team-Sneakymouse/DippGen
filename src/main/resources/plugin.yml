@@ -22,6 +22,14 @@ commands:
         description: Displays plot info of player
         permission: dipp.commands.plotshow
         usage: /<command> <player>
+    plotchests:
+        description: Displays chests and storage within plot
+        permission: dipp.commands.plotchests
+        usage: /<command> <plot>
+    opencontainer:
+        description: Opens container at coordinates
+        permission: dipp.commands.opencontainer
+        usage: /<command> <world> <x> <y> <z>
     deed:
         description: Give deed of current plot to player
         usage: /<command>

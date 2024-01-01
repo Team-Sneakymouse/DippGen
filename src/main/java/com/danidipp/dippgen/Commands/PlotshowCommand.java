@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import com.danidipp.dippgen.Plugin;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -67,14 +68,14 @@ public class PlotshowCommand implements ICommandImpl {
 				var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
 
 				// Display regions
-				sender.sendMessage(playerName + " owns " + ownerRegions.size() + " plots:");
+				sender.sendMessage(Plugin.LOG_PREFIX + playerName + " owns " + ownerRegions.size() + " plots:");
 				for (var region : ownerRegions) {
 					var text = formatRegion(region, world);
 					sender.spigot().sendMessage(text);
 				}
 
 				if (memberRegions.size() > 0) {
-					sender.sendMessage(playerName + " is a member of " + memberRegions.size() + " plots:");
+					sender.sendMessage(Plugin.LOG_PREFIX + playerName + " is a member of " + memberRegions.size() + " plots:");
 					for (var region : memberRegions) {
 						var text = formatRegion(region, world);
 						sender.spigot().sendMessage(text);
@@ -105,11 +106,22 @@ public class PlotshowCommand implements ICommandImpl {
 		teleportComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
 				"/minecraft:tp @s " + regionCenter.getBlockX() + " " + regionCenter.getBlockY() + " " + regionCenter.getBlockZ()));
 
+		var chestsComponent = new TextComponent("[chests]");
+		var hasContainers = PlotChestsCommand.getContainers(region, world).size() > 0;
+		chestsComponent.setColor(hasContainers ? ChatColor.YELLOW : ChatColor.GRAY);
+		chestsComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hasContainers ? "Show plot chests" : "No chests found")));
+		if (hasContainers)
+			chestsComponent
+					.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/dippgen:plotchests " + world.getName() + ":" + region.getId()));
+
 		var text = new TextComponent("- " + region.getId() + " ");
 		text.addExtra(infoComponent);
 
 		text.addExtra(" ");
 		text.addExtra(teleportComponent);
+
+		text.addExtra(" ");
+		text.addExtra(chestsComponent);
 
 		return text;
 	}
