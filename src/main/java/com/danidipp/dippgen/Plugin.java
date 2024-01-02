@@ -69,6 +69,11 @@ public class Plugin extends JavaPlugin {
         count += 3;
         getLogger().info("Registered " + count + " events!");
 
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new DippExpansion(this).register();
+        }
+        getLogger().info("Registered placeholders!");
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -78,11 +83,13 @@ public class Plugin extends JavaPlugin {
                         public void run() {
                             for (var location : replacement.locations()) {
                                 location.getBlock().setType(replacement.getRandomMaterial());
-                                if (replacement.name().startsWith("global_"))
-                                    replacement.locations().remove(location);
+
                             }
-                            Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
-                            Plugin.plugin.saveConfig();
+                            if (replacement.name().startsWith("global_")) {
+                                replacement.locations().clear();
+                                Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
+                                Plugin.plugin.saveConfig();
+                            }
                         }
                     });
                 }

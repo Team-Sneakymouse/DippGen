@@ -2,8 +2,16 @@ package com.danidipp.dippgen.Modules.PlotManagement;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
+
+import org.bukkit.Location;
+
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 public record District(String name, String id, PlotDeed deed) {
 
@@ -25,5 +33,16 @@ public record District(String name, String id, PlotDeed deed) {
 	@Nullable
 	public static District fromId(String id) {
 		return districts.stream().filter(d -> d.id().equals(id)).findFirst().orElse(null);
+	}
+
+	@Nullable
+	public static District fromLocation(Location location) {
+		var wgLocation = BukkitAdapter.adapt(location);
+		RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+		RegionQuery query = container.createQuery();
+		var regions = query.getApplicableRegions(wgLocation).getRegions();
+
+		var district = regions.stream().map(r -> District.fromId(r.getId())).filter(d -> d != null).findFirst().orElse(null);
+		return district;
 	}
 }
