@@ -27,6 +27,7 @@ public record District(String name, String id, PlotDeed deed) {
 			add(new District("Goat Town", "goattown", new PlotDeed("§6Goat Town Deed", "§7Cost: 55 Gold", 29)));
 			add(new District("Dwarven District", "dwarven", new PlotDeed("§6Dwarven Deed", "§7Cost: 50 Gold", 26)));
 			add(new District("Brightvale", "brightvale", new PlotDeed("§6Brightvale Deed", "§7Cost: 10,000 Gold", 32)));
+			add(new District("Royal District", "royal", new PlotDeed("§6Royal Deed", "§7Unobtainable", -1)));
 		}
 	};
 

@@ -1,6 +1,8 @@
 package com.danidipp.dippgen;
 
 import java.util.Collection;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -9,6 +11,7 @@ import com.danidipp.dippgen.Modules.PlotManagement.District;
 import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.md_5.bungee.api.ChatColor;
 
 public class DippExpansion extends PlaceholderExpansion {
     private final Plugin plugin;
@@ -69,7 +72,30 @@ public class DippExpansion extends PlaceholderExpansion {
             var plot = Plot.getPlot(player.getLocation());
             if (plot == null)
                 return "n.a.";
-            return String.join(", ", plot.region().getOwners().getPlayers());
+            var owners = plot.region().getOwners().getUniqueIds();
+            if (owners.isEmpty())
+                return "none";
+            return owners.stream().map(u -> Plugin.plugin.getServer().getOfflinePlayer(u).getName()).collect(Collectors.joining(", "));
+        }
+
+        if (params.equalsIgnoreCase("tablist_footer")) {
+            var plot = Plot.getPlot(player.getLocation());
+            if (plot == null) {
+                var district = District.fromLocation(player.getLocation());
+                var districtName = district == null ? "n.a." : district.name();
+
+                return districtName;
+            } else {
+                var districtName = plot.district().name();
+                var plotName = plot.getId().split("-")[1];
+                var plotOwners = plot.region().getOwners().getUniqueIds();
+                var plotOwnersNames = plotOwners.isEmpty() ? null
+                        : plotOwners.stream().map(u -> Plugin.plugin.getServer().getOfflinePlayer(u).getName())
+                                .collect(Collectors.joining(ChatColor.GRAY + ", " + ChatColor.WHITE));
+                var plotOwnerInfo = ChatColor.GRAY + (plotOwnersNames == null ? "unowned" : "owned by " + ChatColor.WHITE + plotOwnersNames);
+
+                return ChatColor.WHITE + plotName + ChatColor.GRAY + " (" + ChatColor.WHITE + districtName + ChatColor.GRAY + ") " + plotOwnerInfo;
+            }
         }
 
         if (params.equalsIgnoreCase("owns_plot_in_distrct")) {
