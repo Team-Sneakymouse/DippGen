@@ -20,7 +20,7 @@ public record District(String name, String id, PlotDeed deed) {
 			add(new District("The Slums", "slums", new PlotDeed("§6Slums Deed", "§7Cost: 5 Silver", 24)));
 			add(new District("Moon Bay", "moonbay", new PlotDeed("§6Moon Bay Deed", "§7Cost: 100 Gold", 28)));
 			add(new District("Darkvale", "darkvale", new PlotDeed("§6Darkvale Deed", "§7Cost: 666 Gold", 31)));
-			add(new District("Stick District", "sticky", new PlotDeed("§6Stick District Deed", "§7Cost: 20 Gold", 33)));
+			add(new District("Sticky District", "sticky", new PlotDeed("§6Stick District Deed", "§7Cost: 20 Gold", 33)));
 			add(new District("Brickton", "brickton", new PlotDeed("§6Brickton Deed", "§7Cost: 50 Gold", 30)));
 			add(new District("The Grove", "grove", new PlotDeed("§6Grove Deed", "§7Cost: 75 Gold", 25)));
 			add(new District("Southshire", "southshire", new PlotDeed("§6South Shire Deed", "§7Cost: 100 Gold", 23)));

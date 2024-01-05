@@ -36,7 +36,7 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 			return null;
 
 		if (!District.districts.stream().map(d -> d.deed()).anyMatch(d -> {
-			var nameMatch = meta.getDisplayName().startsWith(d.name());
+			var nameMatch = meta.getDisplayName().startsWith(d.name()) || meta.getDisplayName().startsWith("Stick District");
 			var loreMatch = true; //d.firstLore().equals(meta.getLore().get(0));
 			var modelDataMatch = meta.getCustomModelData() == d.getCustomModelData();
 			return nameMatch && loreMatch && modelDataMatch;
