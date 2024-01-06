@@ -203,11 +203,11 @@ class IconUtil {
 
 		var districtLore = "§fDistrict: §6" + plot.district().name();
 		var membersLore = "§fMembers: §e" + memberCount + "§f/§e" + maxMembers;
-		var lockLore = "§fLock Status: " + (isUnlocked ? "§cUnlocked" : "§5Locked");
-		var lockLore2 = "§7While the deed is unlocked, you can throw it to";
-		var lockLore3 = "§7another player to transfer plot ownership to them.";
+		// var lockLore = "§fLock Status: " + (isUnlocked ? "§cUnlocked" : "§5Locked");
+		// var lockLore2 = "§7While the deed is unlocked, you can throw it to";
+		// var lockLore3 = "§7another player to transfer plot ownership to them.";
 		meta.setDisplayName("§bPlot Info");
-		meta.setLore(List.of(districtLore, membersLore, lockLore, lockLore2, lockLore3));
+		meta.setLore(List.of(districtLore, membersLore/*, lockLore, lockLore2, lockLore3 */));
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		item.setItemMeta(meta);
 		return item;
