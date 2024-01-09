@@ -30,7 +30,6 @@ public class BreedAnimalsFlag implements Listener {
 			return;
 
 		event.setCancelled(true);
-		Bukkit.getServer().broadcast("Animal breeding cancelled", "dippgen.debug");
 
 		var mother = event.getMother();
 		var father = event.getFather();
