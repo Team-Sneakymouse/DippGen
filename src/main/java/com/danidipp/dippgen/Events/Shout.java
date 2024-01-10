@@ -29,13 +29,15 @@ public class Shout implements Listener {
 
 		if (message.length() > 2 && message.startsWith("!!") && player.hasPermission("dipp.chat.shout.global")) {
 			// Send to everyone
-			event.setMessage(ChatColor.RED + "" + ChatColor.BOLD + "!! " + ChatColor.RESET + message.substring(2));
+			event.setMessage(message.substring(2));
+			event.setFormat(ChatColor.RED + "" + ChatColor.BOLD + "!! " + ChatColor.RESET + event.getFormat());
 		} else if (message.length() > 2 && message.startsWith("!") && player.hasPermission("dipp.chat.shout")) {
 			if (player.getHealth() > 10 || player.getGameMode() != GameMode.SURVIVAL) {
 				// Large radius
 				if (player.getGameMode() == GameMode.SURVIVAL)
 					Bukkit.getScheduler().runTask(Plugin.plugin, () -> player.damage(10));
-				event.setMessage(ChatColor.RED + "" + ChatColor.BOLD + "! " + ChatColor.RESET + message.substring(1));
+				event.setMessage(message.substring(1));
+				event.setFormat(ChatColor.RED + "" + ChatColor.BOLD + "! " + ChatColor.RESET + event.getFormat());
 				event.getRecipients().removeIf(p -> p.getLocation().distanceSquared(player.getLocation()) > shoutRadius);
 				sendVoidAlert(player, event.getRecipients());
 			} else {
@@ -50,18 +52,6 @@ public class Shout implements Listener {
 			event.getRecipients().removeIf(p -> p.getLocation().distanceSquared(player.getLocation()) > baseRadius);
 			sendVoidAlert(player, event.getRecipients());
 		}
-	}
-
-	String formatShout(String message, short level) {
-		var output = new StringBuilder(6);
-		output.append(ChatColor.RED);
-		output.append(ChatColor.BOLD);
-		output.append('!');
-		if (level == 2)
-			output.append('!');
-		output.append(ChatColor.RESET);
-		output.append(message.substring(level));
-		return output.toString();
 	}
 
 	void sendVoidAlert(Player player, Set<Player> recipients) {
