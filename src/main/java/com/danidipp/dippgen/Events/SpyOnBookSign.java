@@ -51,7 +51,7 @@ public class SpyOnBookSign implements Listener {
 		text.addExtra(bookText);
 
 		for (var player : Bukkit.getServer().getOnlinePlayers()) {
-			if (player.isOp() || player.hasPermission("dipp.bookspy")) {
+			if (player.hasPermission("dipp.bookspy")) {
 				player.spigot().sendMessage(text);
 			}
 		}
