@@ -12,6 +12,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.danidipp.dippgen.Plugin;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
@@ -21,13 +27,25 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
-public class Shout implements Listener {
-	@EventHandler
-	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		if (event.isCancelled()) {
-			Plugin.plugin.getLogger().log(Level.FINE, "Chat event cancelled");
+public class Chat implements Listener {
+	public static StateFlag chatFlag = new StateFlag("chat", true);
+
+	@EventHandler(ignoreCancelled = true)
+	public void chatFlag(AsyncPlayerChatEvent event) {
+
+		Player player = event.getPlayer();
+		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+		RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+		ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
+		if (!chatFrom.testState(localPlayer, chatFlag)) {
+			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "You cannot chat here."));
+			event.setCancelled(true);
 			return;
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		var message = event.getMessage();
 		var player = event.getPlayer();
 		var baseRadius = 12d * 12d;
