@@ -172,6 +172,11 @@ public class Plugin extends JavaPlugin {
                         command.setExecutor(commandImpl.getExecutor());
                         command.setTabCompleter(commandImpl.getTabCompleter());
                         count++;
+                        if (commandImpl instanceof Listener) {
+                            Listener event = (Listener) commandImpl;
+                            this.getServer().getPluginManager().registerEvents(event, Plugin.plugin);
+                            count++;
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -26,7 +26,7 @@ public class PlotClaimGUI {
 	};
 
 	public static Inventory create(Plot plot, Player player) {
-		var plots = Plot.getPlots(player);
+		var plots = Plot.getOwnedPlots(player);
 		var personalPlotLimit = player.hasPermission("dipp.admin") ? plots.size() + 1 : Plot.getPlotLimit(player);
 		var maxUnlockablePlots = 4;
 		var inventoryRows = (int) Math.ceil(Math.max(personalPlotLimit, maxUnlockablePlots) / 9.0);
@@ -34,10 +34,8 @@ public class PlotClaimGUI {
 				"§6Choose a plot slot (" + plots.size() + "/" + personalPlotLimit + " used)");
 		int slot = 0;
 		for (var ownedPlot : plots) {
-			var ownedPlotName = ownedPlot.region().getId().split("-")[1];
-			var ownedPlotDistrict = ownedPlot.region().getId().split("-")[0];
-			var district = District.districts.stream().filter(d -> d.id().equals(ownedPlotDistrict)).findFirst().get();
-			var iconName = district.deed().name() + ": " + ownedPlotName;
+			var district = ownedPlot.district();
+			var iconName = district.deed().name() + ": " + ownedPlot.getName();
 			var iconLore = List.of("§7" + district.name());
 			var iconItem = ItemUtil.generateIcon(Material.RABBIT_FOOT, iconName, iconLore, district.deed().getCustomModelData(), ownedPlot);
 			inventory.setItem(slot, iconItem);

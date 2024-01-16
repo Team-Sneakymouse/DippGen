@@ -103,7 +103,7 @@ public class DippExpansion extends PlaceholderExpansion {
             if (district == null)
                 return "false";
 
-            var plots = Plot.getPlots(player);
+            var plots = Plot.getOwnedPlots(player);
             if (plots.stream().anyMatch(p -> p.district() == district))
                 return "true";
 

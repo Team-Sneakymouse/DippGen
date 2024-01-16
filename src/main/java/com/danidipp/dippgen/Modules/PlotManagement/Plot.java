@@ -75,11 +75,11 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 		}
 	}
 
-	public static Set<Plot> getPlots(Player player) {
-		return getPlots(player.getUniqueId());
+	public static Set<Plot> getOwnedPlots(Player player) {
+		return getOwnedPlots(player.getUniqueId());
 	}
 
-	public static Set<Plot> getPlots(@Nullable UUID uuid) {
+	public static Set<Plot> getOwnedPlots(@Nullable UUID uuid) {
 		Set<Plot> plots = new HashSet<Plot>();
 		if (uuid == null)
 			return plots;
@@ -123,6 +123,10 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 
 	public String getId() {
 		return this.world.getName() + ":" + this.region.getId();
+	}
+
+	public String getName() {
+		return this.region().getId().split("-")[1];
 	}
 
 	public int getMemberLimit() {

@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
@@ -44,7 +45,7 @@ public class Chat implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onPlayerChat(AsyncPlayerChatEvent event) {
 		var message = event.getMessage();
 		var player = event.getPlayer();
@@ -84,7 +85,7 @@ public class Chat implements Listener {
 			var name = PlaceholderAPI.setPlaceholders(player, "%sneakycharacters_character_name%");
 			var nameComponent = new TextComponent(name);
 			nameComponent.setColor(color);
-			var hoverText = ChatColor.YELLOW + "Account name: " + ChatColor.GOLD + "%player_displayname%\n" + org.bukkit.ChatColor.YELLOW
+			var hoverText = ChatColor.YELLOW + "Account name: " + ChatColor.GOLD + "%player_displayname%\n" + ChatColor.YELLOW
 					+ "Voicechat: %cond_voicechat-status%\n" + ChatColor.RESET + "Teleport to player";
 			nameComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(PlaceholderAPI.setPlaceholders(player, hoverText))));
 			nameComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
@@ -103,7 +104,7 @@ public class Chat implements Listener {
 
 	void sendVoidAlert(Player player, Set<Player> recipients) {
 		var visibleRecipients = recipients.stream().filter(p -> p.getTrackedBy().contains(player)).count();
-		Plugin.plugin.getLogger().log(Level.INFO, "normal to " + recipients.size() + " players (" + visibleRecipients + " visible)");
+		Plugin.plugin.getLogger().log(Level.FINE, "normal to " + recipients.size() + " players (" + visibleRecipients + " visible)");
 		if (visibleRecipients <= 0)
 			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Nobody can hear you."));
 	}

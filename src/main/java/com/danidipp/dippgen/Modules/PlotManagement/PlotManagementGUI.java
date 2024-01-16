@@ -182,7 +182,7 @@ class IconUtil {
 		var ownerUUID = plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null);
 		var owner = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : null;
 		var ownerName = owner != null ? owner.getName() : "Not Owned";
-		var ownedPlots = Plot.getPlots(ownerUUID);
+		var ownedPlots = Plot.getOwnedPlots(ownerUUID);
 
 		meta.setOwningPlayer(owner);
 		meta.setDisplayName("§bPlot Owner");

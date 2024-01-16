@@ -35,3 +35,7 @@ commands:
     deed:
         description: Give deed of current plot to player
         usage: /<command>
+    homestone:
+        description: Opens homestone management GUI for player
+        permission: dipp.commands.homestone
+        usage: /<command> <player>
