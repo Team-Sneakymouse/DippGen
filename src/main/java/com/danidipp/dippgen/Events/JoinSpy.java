@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.danidipp.dippgen.Plugin;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -18,19 +19,45 @@ public class JoinSpy implements Listener {
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		if (player.hasPlayedBefore()) {
+		String message = null;
+		if (!player.hasPlayedBefore()) {
+			message = " joined the server for the first time! ";
+		} else {
+			String playtime = PlaceholderAPI.setPlaceholders(player, "%cmi_user_playtime_hourst%");
+			double hours = Double.parseDouble(playtime);
+			if (hours < 2) {
+				message = " joined the server with " + playtime + " hours of playtime. ";
+			}
+		}
+
+		if (message == null) {
 			return;
 		}
-		Plugin.plugin.getLogger().info("New player " + player.getDisplayName() + " joined the server for the first time!");
+		var playerComponent = new TextComponent(ChatColor.YELLOW + player.getDisplayName() + ChatColor.RESET);
+		playerComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to player")));
+		playerComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
 
-		var message = new TextComponent(Plugin.LOG_PREFIX);
-		message.addExtra("New player ");
-		message.addExtra(ChatColor.YELLOW + player.getDisplayName() + ChatColor.RESET);
-		message.addExtra(" joined the server for the first time!");
-		message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
-		message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to player")));
+		var infoComponent = new TextComponent(ChatColor.YELLOW + "[info]");
+		infoComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show player info")));
+		infoComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cmi info " + player.getName()));
 
-		Plugin.plugin.getServer().broadcast(message.toLegacyText(), "dipp.joinspy");
+		var altComponent = new TextComponent(ChatColor.YELLOW + "[alts]");
+		altComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show alts accounts")));
+		altComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cmi checkaccount " + player.getName()));
+
+		var text = new TextComponent(Plugin.LOG_PREFIX);
+		text.addExtra("New player ");
+		text.addExtra(playerComponent);
+		text.addExtra(message);
+		text.addExtra(infoComponent);
+		text.addExtra(" ");
+		text.addExtra(altComponent);
+
+		for (Player p : Plugin.plugin.getServer().getOnlinePlayers()) {
+			if (p.hasPermission("dipp.joinspy")) {
+				p.spigot().sendMessage(text);
+			}
+		}
 	}
 
 }
