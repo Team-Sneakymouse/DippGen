@@ -86,7 +86,7 @@ public class Chat implements Listener {
 			var nameComponent = new TextComponent(name);
 			nameComponent.setColor(color);
 			var hoverText = ChatColor.YELLOW + "Account name: " + ChatColor.GOLD + "%player_displayname%\n" + ChatColor.YELLOW
-					+ "Voicechat: %cond_voicechat-status%\n" + ChatColor.RESET + "Teleport to player";
+					+ "Voicechat: %cond_voicechat-status%\n" + ChatColor.WHITE + "Teleport to player";
 			nameComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(PlaceholderAPI.setPlaceholders(player, hoverText))));
 			nameComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
 
