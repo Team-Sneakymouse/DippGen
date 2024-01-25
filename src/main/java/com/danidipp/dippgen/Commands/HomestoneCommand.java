@@ -81,9 +81,9 @@ public class HomestoneCommand implements ICommandImpl, Listener {
 			Bukkit.getScheduler().runTask(Plugin.plugin, () -> event.getView().close());
 			return;
 		}
-		String command = "cast as " + event.getWhoClicked().getName() + " homestone " + tpLocation.getBlockX() + " " + tpLocation.getBlockY() + " "
+		String command = "ms cast as " + event.getWhoClicked().getName() + " homestone " + tpLocation.getBlockX() + " " + tpLocation.getBlockY() + " "
 				+ tpLocation.getBlockZ() + " " + tpLocation.getYaw() + " " + tpLocation.getPitch();
-		// command = command.replace("cast as " + event.getWhoClicked().getName() + " homestone ",
+		// command = command.replace("ms cast as " + event.getWhoClicked().getName() + " homestone ",
 		// 		"minecraft:tp " + event.getWhoClicked().getName() + " ");
 		event.getWhoClicked().sendMessage(command);
 		Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
