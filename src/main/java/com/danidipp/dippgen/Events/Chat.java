@@ -52,6 +52,9 @@ public class Chat implements Listener {
 		var baseRadius = 12d * 12d;
 		var shoutRadius = 36d * 36d;
 
+		// Remove everyone in a different world
+		event.getRecipients().removeIf(p -> p.getWorld() != player.getWorld());
+
 		if (message.length() > 2 && message.startsWith("!!") && player.hasPermission("dipp.chat.shout.global")) {
 			// Send to everyone
 			event.setMessage(message.substring(2));
