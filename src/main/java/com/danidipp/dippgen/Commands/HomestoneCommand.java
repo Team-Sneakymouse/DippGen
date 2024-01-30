@@ -77,7 +77,7 @@ public class HomestoneCommand implements ICommandImpl, Listener {
 		}
 		var tpLocation = plot.region().getFlag(Plot.teleportLocationFlag);
 		if (tpLocation == null) {
-			event.getWhoClicked().sendMessage(ChatColor.RED + "Error: This plot doesn't have a teleport destination set up!");
+			event.getWhoClicked().sendMessage(ChatColor.RED + "This plot doesn't have a teleport destination set up");
 			Bukkit.getScheduler().runTask(Plugin.plugin, () -> event.getView().close());
 			return;
 		}
@@ -92,7 +92,6 @@ public class HomestoneCommand implements ICommandImpl, Listener {
 
 	static Inventory createInventory(Player player) {
 		var plots = Plot.getOwnedPlots(player);
-		player.sendMessage("" + plots.size());
 		var inventorySlots = (plots.size() / 9 + 1) * 9;
 		var inventory = Bukkit.createInventory(inventoryHolder, inventorySlots, "§6Choose a plot to teleport to");
 		var plotsList = plots.stream().toList();
