@@ -24,9 +24,13 @@ public class JoinSpy implements Listener {
 			message = " joined the server for the first time! ";
 		} else {
 			String playtime = PlaceholderAPI.setPlaceholders(player, "%cmi_user_playtime_hourst%");
-			double hours = Double.parseDouble(playtime);
-			if (hours < 2) {
-				message = " joined the server with " + playtime + " hours of playtime. ";
+			try {
+				double hours = Double.parseDouble(playtime);
+				if (hours < 2) {
+					message = " joined the server with " + playtime + " hours of playtime. ";
+				}
+			} catch (NumberFormatException e) {
+				Plugin.plugin.getLogger().warning("Could not parse playtime for " + player.getName() + ": " + playtime);
 			}
 		}
 
