@@ -24,8 +24,7 @@ public class RequeueOnBlockBreak implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     void onBlockBreakEvent(BlockBreakEvent event) {
         // Bukkit.broadcastMessage("BlockBreakEvent " + event.getBlock().getType().name());
-        if (event.isCancelled())
-            return;
+        if (event.isCancelled()) return;
         for (var replacement : Plugin.plugin.replacements) {
             var matchesLocation = replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()));
             var matchesGlobalType = replacement.name().startsWith("global_")

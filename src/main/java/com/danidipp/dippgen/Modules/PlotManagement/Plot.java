@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -60,8 +59,9 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 			return null;
 
 		var wgWorld = BukkitAdapter.adapt(world);
-		var regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-		var regionManager = regionContainer.get(wgWorld);
+		var regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(wgWorld);
+		if (regionManager == null)
+			return null;
 		var region = regionManager.getRegion(regionId);
 		if (region == null || region.getPriority() != 5)
 			return null;
@@ -88,8 +88,10 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 		for (var world : worlds) {
 			// Get all regions
 			var wgWorld = BukkitAdapter.adapt(world);
-			RegionContainer regionContainer = WorldGuard.getInstance().getPlatform().getRegionContainer();
-			Collection<ProtectedRegion> regions = regionContainer.get(wgWorld).getRegions().values();
+			var regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(wgWorld);
+			if (regionManager == null)
+				continue;
+			Collection<ProtectedRegion> regions = regionManager.getRegions().values();
 
 			for (var region : regions) {
 				if (!region.getOwners().contains(uuid))

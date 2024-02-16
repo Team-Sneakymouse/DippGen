@@ -17,6 +17,10 @@ import org.bukkit.persistence.PersistentDataType;
 import com.danidipp.dippgen.Plugin;
 import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed.DEED_TYPE;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 public class PlotClaimGUI {
 	public static InventoryHolder plotClaimInventoryHolder = new InventoryHolder() {
 		@Override
@@ -31,24 +35,26 @@ public class PlotClaimGUI {
 		var maxUnlockablePlots = 4;
 		var inventoryRows = (int) Math.ceil(Math.max(personalPlotLimit, maxUnlockablePlots) / 9.0);
 		var inventory = Bukkit.createInventory(PlotClaimGUI.plotClaimInventoryHolder, inventoryRows * 9,
-				"§6Choose a plot slot (" + plots.size() + "/" + personalPlotLimit + " used)");
+				Component.text("Choose a plot slot (" + plots.size() + "/" + personalPlotLimit + " used)", NamedTextColor.GOLD));
 		int slot = 0;
 		for (var ownedPlot : plots) {
 			var district = ownedPlot.district();
-			var iconName = district.deed().name() + ": " + ownedPlot.getName();
-			var iconLore = List.of("§7" + district.name());
+			var iconName = Component.text(district.deed().name() + ": " + ownedPlot.getName());
+			var iconLore = List.of(Component.text(district.name(), NamedTextColor.GRAY));
 			var iconItem = ItemUtil.generateIcon(Material.RABBIT_FOOT, iconName, iconLore, district.deed().getCustomModelData(), ownedPlot);
 			inventory.setItem(slot, iconItem);
 			slot++;
 		}
 		for (var i = slot; i < personalPlotLimit; i++) {
-			var iconItem = ItemUtil.generateIcon(Material.WHITE_STAINED_GLASS_PANE, "§2Empty Slot", List.of("§7Click here to claim this plot"), 0,
-					plot);
+			var iconName = Component.text("Empty Slot", NamedTextColor.DARK_GREEN);
+			var iconLore = List.of(Component.text("Click here to claim this plot", NamedTextColor.GRAY));
+			var iconItem = ItemUtil.generateIcon(Material.WHITE_STAINED_GLASS_PANE, iconName, iconLore, 0, plot);
 			inventory.setItem(i, iconItem);
 		}
 		for (var i = personalPlotLimit; i < 4; i++) {
-			var iconItem = ItemUtil.generateIcon(Material.RED_STAINED_GLASS_PANE, "§4Locked Slot",
-					List.of("§7Gain additional plot slots from your skill trees"), 0, plot);
+			var iconName = Component.text("Locked Slot", NamedTextColor.DARK_RED);
+			var iconLore = List.of(Component.text("Gain additional plot slots from your skill trees", NamedTextColor.GRAY));
+			var iconItem = ItemUtil.generateIcon(Material.RED_STAINED_GLASS_PANE, iconName, iconLore, 0, plot);
 			inventory.setItem(i, iconItem);
 		}
 		return inventory;
@@ -123,11 +129,11 @@ public class PlotClaimGUI {
 }
 
 class ItemUtil {
-	public static ItemStack generateIcon(Material material, String name, List<String> lore, int customModelData, Plot plot) {
+	public static ItemStack generateIcon(Material material, TextComponent name, List<TextComponent> lore, int customModelData, Plot plot) {
 		ItemStack icon = new ItemStack(material);
 		ItemMeta meta = icon.getItemMeta();
-		meta.setDisplayName(name);
-		meta.setLore(lore);
+		meta.displayName(name);
+		meta.lore(lore);
 		meta.setCustomModelData(customModelData);
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		icon.setItemMeta(meta);

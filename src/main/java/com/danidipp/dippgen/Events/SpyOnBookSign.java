@@ -10,19 +10,16 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 
 import com.danidipp.dippgen.Plugin;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.ItemTag;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Item;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.nbt.api.BinaryTagHolder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class SpyOnBookSign implements Listener {
 	@EventHandler
 	void onPlayerEditBookEvent(PlayerEditBookEvent event) {
-		if (!event.isSigning())
-			return;
+		if (!event.isSigning()) return;
 
 		var bookMeta = event.getNewBookMeta();
 		var bookId = bookMeta.hashCode();
@@ -33,26 +30,22 @@ public class SpyOnBookSign implements Listener {
 			}
 		}, 12000); // 10 mins
 
-		var playerText = new TextComponent(event.getPlayer().getDisplayName());
-		playerText.setColor(ChatColor.YELLOW);
-		playerText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to player")));
-		playerText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + event.getPlayer().getName()));
+		var playerText = event.getPlayer().displayName().color(NamedTextColor.YELLOW);
+		playerText.hoverEvent(HoverEvent.showText(Component.text("Teleport to player")));
+		playerText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + event.getPlayer().getName()));
 
-		var bookText = new TextComponent(bookMeta.getTitle());
-		bookText.setColor(ChatColor.GOLD);
-		bookText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM,
-				new Item(Material.WRITTEN_BOOK.getKey().toString(), 1, ItemTag.ofNbt(bookMeta.getAsString()))));
-		bookText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + Plugin.plugin.getName() + ":showbook " + bookId));
+		var bookText = bookMeta.title().color(NamedTextColor.GOLD);
+		bookText.hoverEvent(HoverEvent.showItem(Material.WRITTEN_BOOK.getKey().key(), 1, BinaryTagHolder.binaryTagHolder(bookMeta.getAsString())));
+		bookText.clickEvent(ClickEvent.runCommand("/" + Plugin.plugin.getName() + ":showbook " + bookId));
 
-		var text = new TextComponent();
-		text.addExtra(Plugin.LOG_PREFIX);
-		text.addExtra(playerText);
-		text.addExtra(" signed book ");
-		text.addExtra(bookText);
+		var text = Plugin.LOG_PREFIX;
+		text.append(playerText);
+		text.append(Component.text(" signed book "));
+		text.append(bookText);
 
 		for (var player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.hasPermission("dipp.bookspy")) {
-				player.spigot().sendMessage(text);
+				player.sendMessage(text);
 			}
 		}
 

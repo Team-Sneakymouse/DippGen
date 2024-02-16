@@ -2,7 +2,6 @@ package com.danidipp.dippgen.Modules.PlotManagement;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -18,17 +17,17 @@ public record District(String name, String id, Material material, PlotDeed deed)
 
 	public static Set<District> districts = new HashSet<District>() {
 		{
-			add(new District("The Slums", "slums", Material.PODZOL, new PlotDeed("§6Slums Deed", "§7Cost: 5 Silver", 24)));
-			add(new District("Moon Bay", "moonbay", Material.LIGHT_BLUE_CONCRETE_POWDER, new PlotDeed("§6Moon Bay Deed", "§7Cost: 100 Gold", 28)));
-			add(new District("Darkvale", "darkvale", Material.NETHER_BRICKS, new PlotDeed("§6Darkvale Deed", "§7Cost: 666 Gold", 31)));
-			add(new District("Sticky District", "sticky", Material.HONEYCOMB_BLOCK, new PlotDeed("§6Sticky District Deed", "§7Cost: 20 Gold", 33)));
-			add(new District("Brickton", "brickton", Material.BRICKS, new PlotDeed("§6Brickton Deed", "§7Cost: 50 Gold", 30)));
-			add(new District("The Grove", "grove", Material.OAK_LEAVES, new PlotDeed("§6Grove Deed", "§7Cost: 75 Gold", 25)));
-			add(new District("Southshire", "southshire", Material.LAPIS_BLOCK, new PlotDeed("§6South Shire Deed", "§7Cost: 100 Gold", 23)));
-			add(new District("Goat Town", "goattown", Material.CHERRY_LEAVES, new PlotDeed("§6Goat Town Deed", "§7Cost: 55 Gold", 29)));
-			add(new District("Dwarven District", "dwarven", Material.COBBLESTONE, new PlotDeed("§6Dwarven Deed", "§7Cost: 50 Gold", 26)));
-			add(new District("Brightvale", "brightvale", Material.QUARTZ_BLOCK, new PlotDeed("§6Brightvale Deed", "§7Cost: 10,000 Gold", 32)));
-			add(new District("Royal District", "royal", Material.CRAFTING_TABLE, new PlotDeed("§6Royal Deed", "§7Unobtainable", -1)));
+			add(new District("The Slums", "slums", Material.PODZOL, new PlotDeed("Slums Deed", "Cost: 5 Silver", 24)));
+			add(new District("Moon Bay", "moonbay", Material.LIGHT_BLUE_CONCRETE_POWDER, new PlotDeed("Moon Bay Deed", "Cost: 100 Gold", 28)));
+			add(new District("Darkvale", "darkvale", Material.NETHER_BRICKS, new PlotDeed("Darkvale Deed", "Cost: 666 Gold", 31)));
+			add(new District("Sticky District", "sticky", Material.HONEYCOMB_BLOCK, new PlotDeed("Sticky District Deed", "Cost: 20 Gold", 33)));
+			add(new District("Brickton", "brickton", Material.BRICKS, new PlotDeed("Brickton Deed", "Cost: 50 Gold", 30)));
+			add(new District("The Grove", "grove", Material.OAK_LEAVES, new PlotDeed("Grove Deed", "Cost: 75 Gold", 25)));
+			add(new District("Southshire", "southshire", Material.LAPIS_BLOCK, new PlotDeed("South Shire Deed", "Cost: 100 Gold", 23)));
+			add(new District("Goat Town", "goattown", Material.CHERRY_LEAVES, new PlotDeed("Goat Town Deed", "Cost: 55 Gold", 29)));
+			add(new District("Dwarven District", "dwarven", Material.COBBLESTONE, new PlotDeed("Dwarven Deed", "Cost: 50 Gold", 26)));
+			add(new District("Brightvale", "brightvale", Material.QUARTZ_BLOCK, new PlotDeed("Brightvale Deed", "Cost: 10,000 Gold", 32)));
+			add(new District("Royal District", "royal", Material.CRAFTING_TABLE, new PlotDeed("Royal Deed", "Unobtainable", -1)));
 		}
 	};
 

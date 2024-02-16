@@ -14,9 +14,7 @@ public class OpenContainerCommand implements ICommandImpl {
 	@Override
 	public CommandExecutor getExecutor() {
 		return (sender, command, label, args) -> {
-			if (args.length != 4) {
-				return false;
-			}
+			if (args.length != 4) return false;
 			if (!(sender instanceof org.bukkit.entity.Player)) {
 				sender.sendMessage("error: Only players can use this command");
 				return true;

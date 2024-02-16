@@ -1,6 +1,5 @@
 package com.danidipp.dippgen.Events;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Breedable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,16 +17,14 @@ public class BreedAnimalsFlag implements Listener {
 
 	@EventHandler
 	public void onAnimalBreeding(EntityBreedEvent event) {
-		if (event.isCancelled())
-			return;
+		if (event.isCancelled()) return;
 
 		var wgPlayer = WorldGuardPlugin.inst().wrapPlayer((Player) event.getBreeder());
 		var wgLocation = BukkitAdapter.adapt(event.getEntity().getLocation());
 		var container = WorldGuard.getInstance().getPlatform().getRegionContainer();
 		var query = container.createQuery();
 		var regions = query.getApplicableRegions(wgLocation);
-		if (regions.testState(wgPlayer, breedAnimalsFlag))
-			return;
+		if (regions.testState(wgPlayer, breedAnimalsFlag)) return;
 
 		event.setCancelled(true);
 

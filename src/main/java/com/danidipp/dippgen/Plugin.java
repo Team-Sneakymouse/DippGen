@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
@@ -30,13 +29,17 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 public class Plugin extends JavaPlugin {
     public static Plugin plugin;
     public List<Replacement> replacements;
     public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
 
-    public static String LOG_PREFIX = ChatColor.GRAY + "[" + ChatColor.AQUA + "DIPP" + ChatColor.GRAY + "] " + ChatColor.RESET;
+    public static Component LOG_PREFIX = Component.text("[", NamedTextColor.GRAY).append(Component.text("DIPP", NamedTextColor.AQUA))
+            .append(Component.text("] ", NamedTextColor.GRAY));
 
     @Override
     public void onLoad() {

@@ -8,11 +8,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import com.danidipp.dippgen.Plugin;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class JoinSpy implements Listener {
 
@@ -37,29 +36,29 @@ public class JoinSpy implements Listener {
 		if (message == null) {
 			return;
 		}
-		var playerComponent = new TextComponent(ChatColor.YELLOW + player.getDisplayName() + ChatColor.RESET);
-		playerComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Teleport to player")));
-		playerComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
+		var playerComponent = player.displayName().color(NamedTextColor.YELLOW);
+		playerComponent = playerComponent.hoverEvent(HoverEvent.showText(Component.text("Teleport to player")));
+		playerComponent = playerComponent.clickEvent(ClickEvent.runCommand(("/minecraft:tp " + player.getName())));
 
-		var infoComponent = new TextComponent(ChatColor.YELLOW + "[info]");
-		infoComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show player info")));
-		infoComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cmi info " + player.getName()));
+		var infoComponent = Component.text("[info]", NamedTextColor.YELLOW);
+		infoComponent = infoComponent.hoverEvent(HoverEvent.showText(Component.text("Show player info")));
+		infoComponent = infoComponent.clickEvent(ClickEvent.runCommand("/cmi info " + player.getName()));
 
-		var altComponent = new TextComponent(ChatColor.YELLOW + "[alts]");
-		altComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Show alts accounts")));
-		altComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/cmi checkaccount " + player.getName()));
+		var altComponent = Component.text("[alts]", NamedTextColor.YELLOW);
+		altComponent = altComponent.hoverEvent(HoverEvent.showText(Component.text("Show alts accounts")));
+		altComponent = altComponent.clickEvent(ClickEvent.runCommand("/cmi checkaccount " + player.getName()));
 
-		var text = new TextComponent(Plugin.LOG_PREFIX);
-		text.addExtra("New player ");
-		text.addExtra(playerComponent);
-		text.addExtra(message);
-		text.addExtra(infoComponent);
-		text.addExtra(" ");
-		text.addExtra(altComponent);
+		var text = Plugin.LOG_PREFIX;
+		text.append(Component.text("New player "));
+		text.append(playerComponent);
+		text.append(Component.text(message));
+		text.append(infoComponent);
+		text.append(Component.space());
+		text.append(altComponent);
 
 		for (Player p : Plugin.plugin.getServer().getOnlinePlayers()) {
 			if (p.hasPermission("dipp.joinspy")) {
-				p.spigot().sendMessage(text);
+				p.sendMessage(text);
 			}
 		}
 	}

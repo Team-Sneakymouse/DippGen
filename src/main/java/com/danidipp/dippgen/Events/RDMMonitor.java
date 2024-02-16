@@ -1,7 +1,6 @@
 package com.danidipp.dippgen.Events;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,11 +8,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import com.danidipp.dippgen.Plugin;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class RDMMonitor implements Listener {
 	@EventHandler
@@ -24,7 +23,7 @@ public class RDMMonitor implements Listener {
 
 		var victim = event.getEntity();
 
-		var deathMessage = event.getDeathMessage();
+		TextComponent deathMessage = (TextComponent) event.deathMessage();
 		// deathMessage = deathMessage.replaceAll("\\[playerDisplayName\\]", victim.getDisplayName());
 		// deathMessage = deathMessage.replaceAll("\\[sourceDisplayName\\]", killer.getDisplayName());
 		// if (deathMessage.contains("[item]")) {
@@ -43,33 +42,30 @@ public class RDMMonitor implements Listener {
 		// 	}
 		// }
 
-		var deathText = new Text(ChatColor.translateAlternateColorCodes('&', deathMessage));
-		var deathHover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, deathText);
+		var killerText = killer.displayName().color(NamedTextColor.GOLD);
+		killerText.hoverEvent(HoverEvent.showText(deathMessage.append(Component.newline()).append(Component.text("Teleport to player"))));
+		killerText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + killer.getName()));
 
-		var killerText = new TextComponent(ChatColor.GOLD + killer.getDisplayName());
-		killerText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, deathText, new Text("\nTeleport to player")));
-		killerText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + killer.getName()));
+		var victimText = victim.displayName().color(NamedTextColor.GOLD);
+		victimText.hoverEvent(HoverEvent.showText(deathMessage.append(Component.newline()).append(Component.text("Teleport to player"))));
+		victimText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + victim.getName()));
 
-		var victimText = new TextComponent(ChatColor.GOLD + victim.getDisplayName());
-		victimText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, deathText, new Text("\nTeleport to player")));
-		victimText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + victim.getName()));
+		var locationText = Component.text("[TP]", NamedTextColor.YELLOW);
+		locationText.hoverEvent(deathMessage.append(Component.newline()).append(Component.text("Teleport to death position")));
+		locationText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + victim.getLocation().getBlockX() + " " + victim.getLocation().getBlockY()
+				+ " " + victim.getLocation().getBlockZ()));
 
-		var locationText = new TextComponent(ChatColor.YELLOW + "[TP]");
-		locationText.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, deathText, new Text("\nTeleport to death position")));
-		locationText.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + victim.getLocation().getBlockX() + " "
-				+ victim.getLocation().getBlockY() + " " + victim.getLocation().getBlockZ()));
-
-		var text = new TextComponent(Plugin.LOG_PREFIX);
-		text.setHoverEvent(deathHover);
-		text.addExtra(killerText);
-		text.addExtra(ChatColor.YELLOW + " killed ");
-		text.addExtra(victimText);
-		text.addExtra(" ");
-		text.addExtra(locationText);
+		var text = Plugin.LOG_PREFIX;
+		text.hoverEvent(HoverEvent.showText(deathMessage));
+		text.append(killerText);
+		text.append(Component.text(" killed ", NamedTextColor.YELLOW));
+		text.append(victimText);
+		text.append(Component.space());
+		text.append(locationText);
 
 		for (var player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.isOp() || player.hasPermission("dipp.rdmspy")) {
-				player.spigot().sendMessage(text);
+				player.sendMessage(text);
 			}
 		}
 	}

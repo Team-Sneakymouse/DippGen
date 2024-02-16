@@ -23,8 +23,7 @@ public class ShowBookCommand implements ICommandImpl {
 		return new CommandExecutor() {
 			@Override
 			public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-				if (args.length == 0)
-					return false;
+				if (args.length == 0) return false;
 
 				if (!(sender instanceof Player)) {
 					sender.sendMessage("Only players can use this command");

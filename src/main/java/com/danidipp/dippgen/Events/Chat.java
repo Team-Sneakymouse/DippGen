@@ -1,6 +1,6 @@
 package com.danidipp.dippgen.Events;
 
-import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.danidipp.dippgen.Plugin;
 import com.sk89q.worldguard.LocalPlayer;
@@ -20,99 +19,152 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.util.HSVLike;
 
 public class Chat implements Listener {
 	public static StateFlag chatFlag = new StateFlag("chat", true);
 
 	@EventHandler(ignoreCancelled = true)
-	public void chatFlag(AsyncPlayerChatEvent event) {
-
+	public void chatFlag(AsyncChatEvent event) {
 		Player player = event.getPlayer();
 		LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 		RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 		ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
 		if (!chatFrom.testState(localPlayer, chatFlag)) {
-			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "You cannot chat here."));
+			player.sendActionBar(Component.text("You cannot chat here.", NamedTextColor.RED));
 			event.setCancelled(true);
 			return;
 		}
 	}
 
+	enum MessageRenderType {
+		NORMAL, SHOUT, GLOBAL
+	}
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void onPlayerChat(AsyncPlayerChatEvent event) {
-		var message = event.getMessage();
+	public void onPlayerChat(AsyncChatEvent event) {
+		var plainText = PlainTextComponentSerializer.plainText().serialize(event.message());
 		var player = event.getPlayer();
 		var baseRadius = 12d * 12d;
 		var shoutRadius = 36d * 36d;
+		
+		MessageRenderType renderType;
 
-		// Remove everyone in a different world
-		event.getRecipients().removeIf(p -> p.getWorld() != player.getWorld());
-
-		if (message.length() > 2 && message.startsWith("!!") && player.hasPermission("dipp.chat.shout.global")) {
-			// Send to everyone
-			event.setMessage(message.substring(2));
-			event.setFormat(ChatColor.RED + "" + ChatColor.BOLD + "!! " + ChatColor.RESET + event.getFormat());
-		} else if (message.length() > 2 && message.startsWith("!") && player.hasPermission("dipp.chat.shout")) {
+		if (plainText.length() > 2 && plainText.startsWith("!!") && player.hasPermission("dipp.chat.shout.global")) {
+			// Global
+			Plugin.plugin.getLogger().log(Level.INFO, "Global message");
+			event.message(componentReplaceFirst((TextComponent) event.message(), "!!", ""));
+			renderType = MessageRenderType.GLOBAL;
+		} else if (plainText.length() > 1 && plainText.startsWith("!") && player.hasPermission("dipp.chat.shout")) {
+			// Shout
+			event.message(componentReplaceFirst((TextComponent) event.message(), "!", ""));
 			if (player.getHealth() > 10 || player.getGameMode() != GameMode.SURVIVAL) {
 				// Large radius
+				Plugin.plugin.getLogger().log(Level.INFO, "Shout message");
 				if (player.getGameMode() == GameMode.SURVIVAL)
 					Bukkit.getScheduler().runTask(Plugin.plugin, () -> player.damage(10));
-				event.setMessage(message.substring(1));
-				event.setFormat(ChatColor.RED + "" + ChatColor.BOLD + "! " + ChatColor.RESET + event.getFormat());
-				event.getRecipients().removeIf(p -> p.getLocation().distanceSquared(player.getLocation()) > shoutRadius);
-				sendVoidAlert(player, event.getRecipients());
+
+				event.viewers().removeIf(
+						viewer -> (viewer instanceof Player) &&
+								((Player) viewer).getLocation().distanceSquared(player.getLocation()) > shoutRadius);
+				sendVoidAlert(player, event.viewers());
+				renderType = MessageRenderType.SHOUT;
 			} else {
 				// Normal radius
-				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "You are too weak to shout."));
-				event.setMessage(message.substring(1));
-				event.getRecipients().removeIf(p -> p.getLocation().distanceSquared(player.getLocation()) > baseRadius);
+				Plugin.plugin.getLogger().log(Level.INFO, "Shout message (weak)");
+				event.viewers().removeIf(
+						viewer -> (viewer instanceof Player) &&
+								((Player) viewer).getLocation().distanceSquared(player.getLocation()) > baseRadius);
+				player.sendActionBar(Component.text("You are too weak to shout.", NamedTextColor.RED));
 				// sendVoidAlert(player, event.getRecipients()); // No void alert because weakness alert is more important
+				renderType = MessageRenderType.NORMAL;
 			}
 		} else {
-			// Normal radius
-			event.getRecipients().removeIf(p -> p.getLocation().distanceSquared(player.getLocation()) > baseRadius);
-			sendVoidAlert(player, event.getRecipients());
+			// Normal
+			Plugin.plugin.getLogger().log(Level.INFO, "Normal message");
+			event.viewers().removeIf(viewer -> (viewer instanceof Player) &&
+					((Player) viewer).getLocation().distanceSquared(player.getLocation()) > baseRadius);
+			sendVoidAlert(player, event.viewers());
+			renderType = MessageRenderType.NORMAL;
 		}
 
-		var moderators = Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("dipp.chatspy"))
-				.filter(p -> !event.getRecipients().contains(p)).toList();
-		if (moderators.size() > 0) {
-			var color = coordsToRGB(player.getLocation().getBlockX(), player.getLocation().getBlockZ());
-			var name = PlaceholderAPI.setPlaceholders(player, "%sneakycharacters_character_name%");
-			var nameComponent = new TextComponent(name);
-			nameComponent.setColor(color);
-			var hoverText = ChatColor.YELLOW + "Account name: " + ChatColor.GOLD + "%player_displayname%\n" + ChatColor.YELLOW
-					+ "Voicechat: %cond_voicechat-status%\n" + ChatColor.WHITE + "Teleport to player";
-			nameComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(PlaceholderAPI.setPlaceholders(player, hoverText))));
-			nameComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/minecraft:tp " + player.getName()));
-
-			var messageComponent = new TextComponent(event.getMessage());
-			messageComponent.setColor(ChatColor.DARK_GRAY);
-
-			var text = new TextComponent();
-			text.addExtra(nameComponent);
-			text.addExtra(ChatColor.GRAY + ": ");
-			text.addExtra(messageComponent);
-
-			moderators.forEach(p -> p.spigot().sendMessage(text));
+		// Remove everyone in a different world
+		if (renderType != MessageRenderType.GLOBAL) {
+			event.viewers().removeIf(viewer -> (viewer instanceof Player) && ((Player) viewer).getWorld() != player.getWorld());
 		}
+
+		// Add back admins
+		event.viewers().addAll(Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("dipp.chatspy")).toList());
+
+		event.renderer((source, sourceDisplayName, message, viewer) -> {
+			Plugin.plugin.getLogger().log(Level.INFO, "Render final " + source.getName() + " to " + viewer.toString());
+			var hoverText = Component.empty()
+					.append(Component.text("Account name: ", NamedTextColor.YELLOW))
+					.append(Component.text(source.getName(), NamedTextColor.GOLD))
+					.append(Component.newline())
+					.append(Component.text("Voicechat: ", NamedTextColor.YELLOW))
+					.append(Component.text(PlaceholderAPI.setPlaceholders(source, "%cond_voicechat-status%"), NamedTextColor.GOLD));
+
+			// Admin view
+			if (viewer instanceof Player && ((Player) viewer).hasPermission("dipp.chatspy")) {
+				hoverText = hoverText.append(Component.newline())
+						.append(Component.text("Teleport to player", NamedTextColor.WHITE));
+				sourceDisplayName = sourceDisplayName
+						.clickEvent(ClickEvent.runCommand("/minecraft:tp " + source.getName()));
+
+				var inRange = ((Player) viewer).getLocation().distanceSquared(source.getLocation()) <= baseRadius;
+				if (!inRange) {
+					var color = coordsToRGB(source.getLocation().getBlockX(), source.getLocation().getBlockZ());
+					sourceDisplayName = sourceDisplayName.color(color);
+				}
+			}
+			sourceDisplayName = sourceDisplayName.hoverEvent(hoverText);
+
+			var result = Component.empty();
+			switch (renderType) {
+			case GLOBAL -> result = result.append(Component.text("!! ", NamedTextColor.RED, TextDecoration.BOLD));
+			case SHOUT -> result = result.append(Component.text("! ", NamedTextColor.RED, TextDecoration.BOLD));
+			case NORMAL -> {}
+			}
+
+			return result
+					.append(sourceDisplayName)
+					.append(Component.text(": ", NamedTextColor.GRAY))
+					.append(message);
+		});
 	}
 
-	void sendVoidAlert(Player player, Set<Player> recipients) {
-		var visibleRecipients = recipients.stream().filter(p -> p.getTrackedBy().contains(player)).count();
-		Plugin.plugin.getLogger().log(Level.FINE, "normal to " + recipients.size() + " players (" + visibleRecipients + " visible)");
+	TextComponent componentReplaceFirst(TextComponent component, String search, String replace) {
+		if (!component.content().isEmpty()) {
+			var content = component.content().replaceFirst(search, replace);
+			return component.content(content);
+		} else if (!component.children().isEmpty()) {
+			var children = new ArrayList<Component>(component.children());
+			var child = (TextComponent) children.get(0);
+			child = componentReplaceFirst(child, search, replace);
+			children.set(0, child);
+			return component.children(children);
+		}
+		return component;
+	}
+
+	void sendVoidAlert(Player player, Set<Audience> viewers) {
+		var visibleRecipients = viewers.stream().filter(v -> (v instanceof Player) && ((Player) v).getTrackedBy().contains(player)).count();
 		if (visibleRecipients <= 0)
-			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.RED + "Nobody can hear you."));
+			player.sendActionBar(Component.text("Nobody can hear you.", NamedTextColor.RED));
 	}
 
-	ChatColor coordsToRGB(int x, int z) {
+	TextColor coordsToRGB(int x, int z) {
 		int xMin = 4400;
 		int xMax = 5600;
 		int yMin = 4400;
@@ -121,12 +173,11 @@ public class Chat implements Listener {
 		double scaledX = (2 * (x - xMin) / (double) (xMax - xMin)) - 1;
 		double scaledZ = (2 * (z - yMin) / (double) (yMax - yMin)) - 1;
 
-		double hue = Math.toDegrees(Math.atan2(scaledZ, scaledX));
-		hue = (hue + 360) % 360;
-
-		double saturation = Math.sqrt(scaledX * scaledX + scaledZ * scaledZ);
+		double hue = (Math.toDegrees(Math.atan2(scaledZ, scaledX)) + 360) % 360;
+		double saturation = Math.sqrt(scaledX * scaledX + scaledZ * scaledZ) % 1.0;
 		double value = 0.75;
 
-		return ChatColor.of(new Color(Color.HSBtoRGB((float) hue / 360, (float) saturation, (float) value)));
+		var hsv = HSVLike.hsvLike((float) hue / 360, (float) saturation, (float) value);
+		return TextColor.color(hsv);
 	}
 }

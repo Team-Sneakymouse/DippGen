@@ -8,13 +8,15 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.danidipp.dippgen.Plugin;
 
+import net.kyori.adventure.text.TextComponent;
+
 public class ReplacementRegistration implements Listener {
 	@EventHandler
 	public void onBlockBreakEvent(BlockBreakEvent event) {
 		var item = event.getPlayer().getInventory().getItemInMainHand();
 		if (item == null || item.getItemMeta() == null || !item.getItemMeta().hasDisplayName())
 			return;
-		var nameParts = item.getItemMeta().getDisplayName().split(":");
+		var nameParts = ((TextComponent) item.getItemMeta().displayName()).content().split(":");
 		if (nameParts.length != 2 || !nameParts[0].equals("dipp"))
 			return;
 
@@ -53,7 +55,7 @@ public class ReplacementRegistration implements Listener {
 		var item = event.getItemInHand();
 		if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName())
 			return;
-		var nameParts = item.getItemMeta().getDisplayName().split(":");
+		var nameParts = ((TextComponent) item.getItemMeta().displayName()).content().split(":");
 		if (nameParts.length != 2 || !nameParts[0].equals("dipp"))
 			return;
 

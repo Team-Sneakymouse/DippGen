@@ -24,11 +24,11 @@ import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 public class PlotChestsCommand implements ICommandImpl {
 
@@ -40,9 +40,7 @@ public class PlotChestsCommand implements ICommandImpl {
 	@Override
 	public CommandExecutor getExecutor() {
 		return (sender, command, label, args) -> {
-			if (args.length != 1) {
-				return false;
-			}
+			if (args.length != 1) return false;
 			var plotId = args[0];
 			var plot = Plot.getPlot(plotId);
 			if (plot == null) {
@@ -53,9 +51,7 @@ public class PlotChestsCommand implements ICommandImpl {
 			var inventoryBlocks = getContainers(plot.region(), plot.world());
 
 			sender.sendMessage(Plugin.LOG_PREFIX + "Found " + inventoryBlocks.size() + " inventories in plot " + plotId + ":");
-			for (var inventoryBlock : inventoryBlocks) {
-				sender.spigot().sendMessage(formatBlock(inventoryBlock));
-			}
+			for (var inventoryBlock : inventoryBlocks) { sender.sendMessage(formatBlock(inventoryBlock)); }
 
 			return true;
 		};
@@ -89,19 +85,21 @@ public class PlotChestsCommand implements ICommandImpl {
 		return inventoryBlocks;
 	}
 
-	static TextComponent formatBlock(Block inventoryBlock) {
+	static Component formatBlock(Block inventoryBlock) {
 		Container container = (Container) inventoryBlock.getState();
-		var name = container.getCustomName() != null ? container.getCustomName() : inventoryBlock.getType().name();
+		var name = container.customName() != null ? container.customName() : Component.text(inventoryBlock.getType().name());
 		var pos = inventoryBlock.getLocation();
 		var slotsUsed = Arrays.stream(container.getInventory().getContents()).filter(item -> item != null).count();
 		var maxSlots = container.getInventory().getSize();
 
-		var text = new TextComponent();
-		text.setText(name + ChatColor.DARK_GRAY + " [" + ChatColor.GRAY + pos.getBlockX() + ChatColor.DARK_GRAY + ", " + ChatColor.GRAY
-				+ pos.getBlockY() + ChatColor.DARK_GRAY + ", " + ChatColor.GRAY + pos.getBlockZ() + ChatColor.DARK_GRAY + "]: " + ChatColor.YELLOW
-				+ slotsUsed + ChatColor.WHITE + "/" + ChatColor.YELLOW + maxSlots);
-		text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open")));
-		text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+		TextComponent text = Component.textOfChildren(name, Component.space(), Component.text("[", NamedTextColor.DARK_GRAY),
+				Component.text(pos.getBlockX(), NamedTextColor.GRAY), Component.text(", ", NamedTextColor.DARK_GRAY),
+				Component.text(pos.getBlockY(), NamedTextColor.GRAY), Component.text(", ", NamedTextColor.DARK_GRAY),
+				Component.text(pos.getBlockZ(), NamedTextColor.GRAY), Component.text("]: ", NamedTextColor.DARK_GRAY),
+				Component.text(slotsUsed, NamedTextColor.YELLOW), Component.text("/", NamedTextColor.WHITE),
+				Component.text(maxSlots, NamedTextColor.YELLOW));
+		text.hoverEvent(HoverEvent.showText(Component.text("Click to open")));
+		text.clickEvent(ClickEvent.runCommand(
 				"/dippgen:opencontainer " + pos.getWorld().getName() + " " + pos.getBlockX() + " " + pos.getBlockY() + " " + pos.getBlockZ()));
 		return text;
 	}
