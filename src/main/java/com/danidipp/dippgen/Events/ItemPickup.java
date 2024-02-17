@@ -10,7 +10,7 @@ public class ItemPickup implements Listener {
 	@EventHandler
 	public void onItemPickup(PlayerAttemptPickupItemEvent event) {
 		Plugin.plugin.getLogger().info("Item pickup event");
-		if (!event.getPlayer().isSneaking()){
+		if (!event.getPlayer().isSneaking()) {
 			event.setCancelled(true);
 			var item = event.getItem();
 			var pickupDelay = Math.max(5, item.getPickupDelay());

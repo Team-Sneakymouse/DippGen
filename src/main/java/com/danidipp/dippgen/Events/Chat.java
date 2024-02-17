@@ -2,7 +2,6 @@ package com.danidipp.dippgen.Events;
 
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -136,9 +135,10 @@ public class Chat implements Listener {
 
 			var result = Component.empty();
 			switch (renderType) {
-			case GLOBAL -> result = result.append(Component.text("!! ", NamedTextColor.RED, TextDecoration.BOLD));
-			case SHOUT -> result = result.append(Component.text("! ", NamedTextColor.RED, TextDecoration.BOLD));
-			case NORMAL -> {}
+				case GLOBAL -> result = result.append(Component.text("!! ", NamedTextColor.RED, TextDecoration.BOLD));
+				case SHOUT -> result = result.append(Component.text("! ", NamedTextColor.RED, TextDecoration.BOLD));
+				case NORMAL -> {
+				}
 			}
 
 			return result
@@ -180,7 +180,7 @@ public class Chat implements Listener {
 		double hue = (Math.toDegrees(Math.atan2(scaledZ, scaledX)) + 360) % 360;
 
 		double saturation = Math.hypot(scaledX, scaledZ) % 2.0;
-		if(saturation > 1.0) saturation = 2.0 - saturation;
+		if (saturation > 1.0) saturation = 2.0 - saturation;
 
 		double value = 0.75;
 
