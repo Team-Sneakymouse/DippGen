@@ -103,7 +103,7 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 			if (item == null || item.getType() != Material.RABBIT_FOOT)
 				return;
 			var itemName = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
-			Plugin.plugin.getLogger().info("Item name: " + itemName);
+			// Plugin.plugin.getLogger().info("Item name: " + itemName);
 
 			var deedType = PlotDeed.getType(item.getItemMeta());
 			if (deedType == null)

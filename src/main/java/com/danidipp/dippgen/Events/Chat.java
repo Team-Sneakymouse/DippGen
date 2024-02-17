@@ -106,6 +106,9 @@ public class Chat implements Listener {
 		event.viewers().addAll(Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("dipp.chatspy")).toList());
 
 		event.renderer((source, sourceDisplayName, message, viewer) -> {
+			var characterName = PlaceholderAPI.setPlaceholders(source, "%sneakycharacters_character_name%");
+			sourceDisplayName = ((TextComponent) sourceDisplayName).content(characterName).color(NamedTextColor.GRAY);
+
 			// Plugin.plugin.getLogger().log(Level.INFO, "Render final " + source.getName() + " to " + viewer.toString());
 			var hoverText = Component.empty()
 					.append(Component.text("Account name: ", NamedTextColor.YELLOW))
@@ -143,7 +146,7 @@ public class Chat implements Listener {
 
 			return result
 					.append(sourceDisplayName)
-					.append(Component.text(": ", NamedTextColor.GRAY))
+					.append(Component.text(": ", NamedTextColor.DARK_GRAY))
 					.append(message);
 		});
 	}
