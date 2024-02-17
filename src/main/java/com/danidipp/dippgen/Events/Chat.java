@@ -57,12 +57,12 @@ public class Chat implements Listener {
 		var player = event.getPlayer();
 		var baseRadius = 12d * 12d;
 		var shoutRadius = 36d * 36d;
-		
+
 		MessageRenderType renderType;
 
 		if (plainText.length() > 2 && plainText.startsWith("!!") && player.hasPermission("dipp.chat.shout.global")) {
 			// Global
-			Plugin.plugin.getLogger().log(Level.INFO, "Global message");
+			// Plugin.plugin.getLogger().log(Level.INFO, "Global message");
 			event.message(componentReplaceFirst((TextComponent) event.message(), "!!", ""));
 			renderType = MessageRenderType.GLOBAL;
 		} else if (plainText.length() > 1 && plainText.startsWith("!") && player.hasPermission("dipp.chat.shout")) {
@@ -70,7 +70,7 @@ public class Chat implements Listener {
 			event.message(componentReplaceFirst((TextComponent) event.message(), "!", ""));
 			if (player.getHealth() > 10 || player.getGameMode() != GameMode.SURVIVAL) {
 				// Large radius
-				Plugin.plugin.getLogger().log(Level.INFO, "Shout message");
+				// Plugin.plugin.getLogger().log(Level.INFO, "Shout message");
 				if (player.getGameMode() == GameMode.SURVIVAL)
 					Bukkit.getScheduler().runTask(Plugin.plugin, () -> player.damage(10));
 
@@ -81,7 +81,7 @@ public class Chat implements Listener {
 				renderType = MessageRenderType.SHOUT;
 			} else {
 				// Normal radius
-				Plugin.plugin.getLogger().log(Level.INFO, "Shout message (weak)");
+				// Plugin.plugin.getLogger().log(Level.INFO, "Shout message (weak)");
 				event.viewers().removeIf(
 						viewer -> (viewer instanceof Player) &&
 								((Player) viewer).getLocation().distanceSquared(player.getLocation()) > baseRadius);
@@ -91,7 +91,7 @@ public class Chat implements Listener {
 			}
 		} else {
 			// Normal
-			Plugin.plugin.getLogger().log(Level.INFO, "Normal message");
+			// Plugin.plugin.getLogger().log(Level.INFO, "Normal message");
 			event.viewers().removeIf(viewer -> (viewer instanceof Player) &&
 					((Player) viewer).getLocation().distanceSquared(player.getLocation()) > baseRadius);
 			sendVoidAlert(player, event.viewers());
@@ -107,7 +107,7 @@ public class Chat implements Listener {
 		event.viewers().addAll(Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("dipp.chatspy")).toList());
 
 		event.renderer((source, sourceDisplayName, message, viewer) -> {
-			Plugin.plugin.getLogger().log(Level.INFO, "Render final " + source.getName() + " to " + viewer.toString());
+			// Plugin.plugin.getLogger().log(Level.INFO, "Render final " + source.getName() + " to " + viewer.toString());
 			var hoverText = Component.empty()
 					.append(Component.text("Account name: ", NamedTextColor.YELLOW))
 					.append(Component.text(source.getName(), NamedTextColor.GOLD))
@@ -122,7 +122,11 @@ public class Chat implements Listener {
 				sourceDisplayName = sourceDisplayName
 						.clickEvent(ClickEvent.runCommand("/minecraft:tp " + source.getName()));
 
-				var inRange = ((Player) viewer).getLocation().distanceSquared(source.getLocation()) <= baseRadius;
+				var inRange = switch (renderType) {
+					case GLOBAL -> true;
+					case SHOUT -> source.getLocation().distanceSquared(((Player) viewer).getLocation()) <= shoutRadius;
+					case NORMAL -> source.getLocation().distanceSquared(((Player) viewer).getLocation()) <= baseRadius;
+				};
 				if (!inRange) {
 					var color = coordsToRGB(source.getLocation().getBlockX(), source.getLocation().getBlockZ());
 					sourceDisplayName = sourceDisplayName.color(color);
@@ -174,7 +178,10 @@ public class Chat implements Listener {
 		double scaledZ = (2 * (z - yMin) / (double) (yMax - yMin)) - 1;
 
 		double hue = (Math.toDegrees(Math.atan2(scaledZ, scaledX)) + 360) % 360;
-		double saturation = Math.sqrt(scaledX * scaledX + scaledZ * scaledZ) % 1.0;
+
+		double saturation = Math.hypot(scaledX, scaledZ) % 2.0;
+		if(saturation > 1.0) saturation = 2.0 - saturation;
+
 		double value = 0.75;
 
 		var hsv = HSVLike.hsvLike((float) hue / 360, (float) saturation, (float) value);
