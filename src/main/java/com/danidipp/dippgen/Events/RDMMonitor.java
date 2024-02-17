@@ -1,13 +1,17 @@
 package com.danidipp.dippgen.Events;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 
 import com.danidipp.dippgen.Plugin;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -15,32 +19,46 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class RDMMonitor implements Listener {
+	public boolean limitPlayerDamage(Player player) {
+		var playtimeString = PlaceholderAPI.setPlaceholders(player, "%cmi_user_playtime_hourst%");
+		try {
+			var playtime = Float.parseFloat(playtimeString);
+			if (playtime < 100.0) return true;
+		} catch (NumberFormatException e) {
+			Plugin.plugin.getLogger().warning("Error parsing playtime: " + playtimeString);
+		}
+		return false;
+	}
+
+	@EventHandler
+	public void onPlayerDamage(EntityDamageByEntityEvent event){
+		var damager = event.getDamager();
+		var victim = event.getEntity();
+
+		if(!(damager instanceof Player) || !(victim instanceof Player)) return;
+		if(limitPlayerDamage((Player) damager)) event.setCancelled(true);
+	}
+
+	@EventHandler
+	public void onBobberHit(ProjectileHitEvent event){
+		if (!(event.getEntity() instanceof FishHook)) return;
+		if (event.getHitEntity() == null || !(event.getHitEntity() instanceof Player)) return;
+		var hooker = event.getEntity().getShooter();
+		if (hooker == null || !(hooker instanceof Player)) return;
+		
+		if (limitPlayerDamage((Player) hooker)) {
+			event.setCancelled(true);
+		}
+	}
+
 	@EventHandler
 	public void onKill(PlayerDeathEvent event) {
 		var killer = event.getEntity().getKiller();
-		if (killer == null || !(killer instanceof Player))
-			return;
+		if (killer == null || !(killer instanceof Player)) return;
 
 		var victim = event.getEntity();
 
 		TextComponent deathMessage = (TextComponent) event.deathMessage();
-		// deathMessage = deathMessage.replaceAll("\\[playerDisplayName\\]", victim.getDisplayName());
-		// deathMessage = deathMessage.replaceAll("\\[sourceDisplayName\\]", killer.getDisplayName());
-		// if (deathMessage.contains("[item]")) {
-		// 	var item = victim.getInventory().getItemInMainHand();
-		// 	if (item != null && item.getType() != Material.AIR) {
-		// 		String itemName;
-		// 		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-		// 			itemName = item.getItemMeta().getDisplayName();
-		// 		} else {
-		// 			itemName = item.getType().name().toLowerCase().replaceAll("_", " ");
-		// 		}
-
-		// 		deathMessage = deathMessage.replaceAll("\\[item\\]", itemName);
-		// 	} else {
-		// 		deathMessage = deathMessage.replaceAll("\\[item\\]", "fists");
-		// 	}
-		// }
 
 		var killerText = killer.displayName().color(NamedTextColor.GOLD);
 		killerText.hoverEvent(HoverEvent.showText(deathMessage.append(Component.newline()).append(Component.text("Teleport to player"))));
