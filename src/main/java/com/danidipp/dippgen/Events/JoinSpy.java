@@ -48,13 +48,13 @@ public class JoinSpy implements Listener {
 		altComponent = altComponent.hoverEvent(HoverEvent.showText(Component.text("Show alts accounts")));
 		altComponent = altComponent.clickEvent(ClickEvent.runCommand("/cmi checkaccount " + player.getName()));
 
-		var text = Plugin.LOG_PREFIX;
-		text.append(Component.text("New player "));
-		text.append(playerComponent);
-		text.append(Component.text(message));
-		text.append(infoComponent);
-		text.append(Component.space());
-		text.append(altComponent);
+		var text = Plugin.LOG_PREFIX
+				.append(Component.text("New player "))
+				.append(playerComponent)
+				.append(Component.text(message))
+				.append(infoComponent)
+				.append(Component.space())
+				.append(altComponent);
 
 		for (Player p : Plugin.plugin.getServer().getOnlinePlayers()) {
 			if (p.hasPermission("dipp.joinspy")) {

@@ -31,21 +31,21 @@ public class RDMMonitor implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerDamage(EntityDamageByEntityEvent event){
+	public void onPlayerDamage(EntityDamageByEntityEvent event) {
 		var damager = event.getDamager();
 		var victim = event.getEntity();
 
-		if(!(damager instanceof Player) || !(victim instanceof Player)) return;
-		if(limitPlayerDamage((Player) damager)) event.setCancelled(true);
+		if (!(damager instanceof Player) || !(victim instanceof Player)) return;
+		if (limitPlayerDamage((Player) damager)) event.setCancelled(true);
 	}
 
 	@EventHandler
-	public void onBobberHit(ProjectileHitEvent event){
+	public void onBobberHit(ProjectileHitEvent event) {
 		if (!(event.getEntity() instanceof FishHook)) return;
 		if (event.getHitEntity() == null || !(event.getHitEntity() instanceof Player)) return;
 		var hooker = event.getEntity().getShooter();
 		if (hooker == null || !(hooker instanceof Player)) return;
-		
+
 		if (limitPlayerDamage((Player) hooker)) {
 			event.setCancelled(true);
 		}
@@ -73,13 +73,13 @@ public class RDMMonitor implements Listener {
 		locationText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + victim.getLocation().getBlockX() + " " + victim.getLocation().getBlockY()
 				+ " " + victim.getLocation().getBlockZ()));
 
-		var text = Plugin.LOG_PREFIX;
-		text.hoverEvent(HoverEvent.showText(deathMessage));
-		text.append(killerText);
-		text.append(Component.text(" killed ", NamedTextColor.YELLOW));
-		text.append(victimText);
-		text.append(Component.space());
-		text.append(locationText);
+		var text = Plugin.LOG_PREFIX
+				.hoverEvent(HoverEvent.showText(deathMessage))
+				.append(killerText)
+				.append(Component.text(" killed ", NamedTextColor.YELLOW))
+				.append(victimText)
+				.append(Component.space())
+				.append(locationText);
 
 		for (var player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.isOp() || player.hasPermission("dipp.rdmspy")) {

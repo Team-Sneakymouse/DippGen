@@ -106,6 +106,7 @@ public class Chat implements Listener {
 		event.viewers().addAll(Bukkit.getOnlinePlayers().stream().filter(p -> p.hasPermission("dipp.chatspy")).toList());
 
 		event.renderer((source, sourceDisplayName, message, viewer) -> {
+			// TODO: OOC format
 			var characterName = PlaceholderAPI.setPlaceholders(source, "%sneakycharacters_character_name%");
 			sourceDisplayName = ((TextComponent) sourceDisplayName).content(characterName).color(NamedTextColor.GRAY);
 
@@ -132,6 +133,7 @@ public class Chat implements Listener {
 				if (!inRange) {
 					var color = coordsToRGB(source.getLocation().getBlockX(), source.getLocation().getBlockZ());
 					sourceDisplayName = sourceDisplayName.color(color);
+					message = message.color(NamedTextColor.GRAY);
 				}
 			}
 			sourceDisplayName = sourceDisplayName.hoverEvent(hoverText);
@@ -146,7 +148,7 @@ public class Chat implements Listener {
 
 			return result
 					.append(sourceDisplayName)
-					.append(Component.text(": ", NamedTextColor.DARK_GRAY))
+					.append(Component.text(": ", NamedTextColor.GRAY))
 					.append(message);
 		});
 	}
