@@ -22,6 +22,7 @@ import com.danidipp.dippgen.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public record PlotDeed(String name, String firstLore, int getCustomModelData) {
@@ -71,21 +72,24 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 		meta.setCustomModelData(deed.getCustomModelData);
 
 		switch (type) {
-		case CLAIM:
-			meta.displayName(Component.text(deed.name, NamedTextColor.GOLD));
-			meta.lore(List.of(Component.text(deed.firstLore, NamedTextColor.GRAY)));
-			break;
-		case MANAGEMENT:
-			var ownerName = plot.region().getOwners().getUniqueIds().stream().map(uuid -> Plugin.plugin.getServer().getOfflinePlayer(uuid))
-					.map(OfflinePlayer::getName).collect(Collectors.joining(", "));
-			meta.displayName(Component.text(deed.name + ": " + plot.region().getId().split("-")[1], NamedTextColor.GOLD));
-			meta.lore(List.of(Component.text("Owner: ", NamedTextColor.YELLOW).append(Component.text(ownerName, NamedTextColor.GOLD)),
-					Component.text("Open to manage your plot", NamedTextColor.GRAY)));
-			break;
-		case OPEN:
-			meta.displayName(Component.text(deed.name, NamedTextColor.GOLD));
-			meta.lore(List.of(Component.text("Dani forgot to update this!", NamedTextColor.GRAY)));
-			break;
+			case CLAIM:
+				meta.displayName(Component.text(deed.name, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+				meta.lore(List.of(Component.text(deed.firstLore, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+				break;
+			case MANAGEMENT:
+				var ownerName = plot.region().getOwners().getUniqueIds().stream().map(uuid -> Plugin.plugin.getServer().getOfflinePlayer(uuid))
+						.map(OfflinePlayer::getName).collect(Collectors.joining(", "));
+				meta.displayName(Component.text(deed.name + ": " + plot.region().getId().split("-")[1], NamedTextColor.GOLD)
+						.decoration(TextDecoration.ITALIC, false));
+				meta.lore(List.of(
+						Component.text("Owner: ", NamedTextColor.YELLOW).append(Component.text(ownerName, NamedTextColor.GOLD))
+								.decoration(TextDecoration.ITALIC, false),
+						Component.text("Open to manage your plot", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
+				break;
+			case OPEN:
+				meta.displayName(Component.text(deed.name, NamedTextColor.GOLD));
+				meta.lore(List.of(Component.text("Dani forgot to update this!", NamedTextColor.GRAY)));
+				break;
 		}
 		meta.getPersistentDataContainer().set(PLOT_ID_KEY, PersistentDataType.STRING, plot.region().getId());
 		item.setItemMeta(meta);
@@ -119,48 +123,48 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 			}
 
 			switch (deedType) {
-			case CLAIM:
-				var currentPlotDistrictId = currentPlot.region().getId().split("-")[0];
-				var plotDistrict = District.districts.stream().filter(d -> d.id().equals(currentPlotDistrictId)).findFirst().orElse(null);
-				var deedDistrict = District.districts.stream().filter(d -> d.deed().name.equals(itemName)).findFirst().orElse(null);
-				if (plotDistrict == null || deedDistrict == null) {
-					player.sendMessage("error: You can't use this deed here");
-					return;
-				}
+				case CLAIM:
+					var currentPlotDistrictId = currentPlot.region().getId().split("-")[0];
+					var plotDistrict = District.districts.stream().filter(d -> d.id().equals(currentPlotDistrictId)).findFirst().orElse(null);
+					var deedDistrict = District.districts.stream().filter(d -> d.deed().name.equals(itemName)).findFirst().orElse(null);
+					if (plotDistrict == null || deedDistrict == null) {
+						player.sendMessage("error: You can't use this deed here");
+						return;
+					}
 
-				if (currentPlot.region().getOwners().size() > 0) {
-					player.sendMessage("error: This plot is already claimed");
-					return;
-				}
+					if (currentPlot.region().getOwners().size() > 0) {
+						player.sendMessage("error: This plot is already claimed");
+						return;
+					}
 
-				if (plotDistrict != deedDistrict) {
-					player.sendMessage("error: This deed is not for this district");
-					return;
-				}
-				player.openInventory(PlotClaimGUI.create(currentPlot, player));
-				break;
-			case MANAGEMENT:
-				var persistentData = item.getItemMeta().getPersistentDataContainer();
-				var plotId = persistentData.get(PLOT_ID_KEY, PersistentDataType.STRING);
-				if (plotId == null) {
-					player.sendMessage("error: This management deed does not have a plot id. Please tell Dani!");
-					return;
-				}
-				if (!currentPlot.region().getId().endsWith(plotId)) {
-					player.sendMessage("error: This deed is not for this plot");
-					return;
-				}
-				var isOwner = currentPlot.region().getOwners().contains(player.getUniqueId());
-				var isMember = currentPlot.region().getMembers().contains(player.getUniqueId());
-				if (!isOwner && !isMember) {
-					player.sendMessage("error: You are not a member of this plot");
-					return;
-				}
-				player.openInventory(PlotManagementGUI.create(currentPlot, player));
-				break;
-			case OPEN:
-				player.openInventory(PlotClaimGUI.create(currentPlot, player));
-				break;
+					if (plotDistrict != deedDistrict) {
+						player.sendMessage("error: This deed is not for this district");
+						return;
+					}
+					player.openInventory(PlotClaimGUI.create(currentPlot, player));
+					break;
+				case MANAGEMENT:
+					var persistentData = item.getItemMeta().getPersistentDataContainer();
+					var plotId = persistentData.get(PLOT_ID_KEY, PersistentDataType.STRING);
+					if (plotId == null) {
+						player.sendMessage("error: This management deed does not have a plot id. Please tell Dani!");
+						return;
+					}
+					if (!currentPlot.region().getId().endsWith(plotId)) {
+						player.sendMessage("error: This deed is not for this plot");
+						return;
+					}
+					var isOwner = currentPlot.region().getOwners().contains(player.getUniqueId());
+					var isMember = currentPlot.region().getMembers().contains(player.getUniqueId());
+					if (!isOwner && !isMember) {
+						player.sendMessage("error: You are not a member of this plot");
+						return;
+					}
+					player.openInventory(PlotManagementGUI.create(currentPlot, player));
+					break;
+				case OPEN:
+					player.openInventory(PlotClaimGUI.create(currentPlot, player));
+					break;
 			}
 		}
 	};

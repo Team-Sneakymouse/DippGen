@@ -33,54 +33,51 @@ public class PlotshowCommand implements ICommandImpl {
 
 	@Override
 	public CommandExecutor getExecutor() {
-		return new CommandExecutor() {
-			@Override
-			public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-				if (args.length == 0) return false; // No player name provided
+		return (sender, command, label, args) -> {
+			if (args.length == 0) return false; // No player name provided
 
-				String playerName = args[0];
-				OfflinePlayer player;
-				try {
-					var uuid = UUID.fromString(playerName);
-					player = Bukkit.getOfflinePlayer(uuid);
-				} catch (IllegalArgumentException e) {
-					player = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase()))
-							.findFirst().orElse(null);
-				}
+			String playerName = args[0];
+			OfflinePlayer player;
+			try {
+				var uuid = UUID.fromString(playerName);
+				player = Bukkit.getOfflinePlayer(uuid);
+			} catch (IllegalArgumentException e) {
+				player = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase()))
+						.findFirst().orElse(null);
+			}
 
-				if (player == null) {
-					sender.sendMessage("error: Player " + playerName + " does not exist");
-					return true;
-				}
+			if (player == null) {
+				sender.sendMessage("error: Player " + playerName + " does not exist");
+				return true;
+			}
 
-				// Get all regions
-				World world = sender instanceof Player ? ((Player) sender).getWorld() : Bukkit.getWorlds().get(0);
-				var wgWorld = BukkitAdapter.adapt(world);
-				RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(wgWorld);
-				Collection<ProtectedRegion> regions = regionManager != null ? regionManager.getRegions().values() : List.of();
+			// Get all regions
+			World world = sender instanceof Player ? ((Player) sender).getWorld() : Bukkit.getWorlds().get(0);
+			var wgWorld = BukkitAdapter.adapt(world);
+			RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(wgWorld);
+			Collection<ProtectedRegion> regions = regionManager != null ? regionManager.getRegions().values() : List.of();
 
-				// Filter regions by owner
-				var uuid = player.getUniqueId();
-				var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
-				var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
+			// Filter regions by owner
+			var uuid = player.getUniqueId();
+			var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
+			var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
 
-				// Display regions
-				sender.sendMessage(Plugin.LOG_PREFIX + playerName + " owns " + ownerRegions.size() + " plots:");
-				for (var region : ownerRegions) {
+			// Display regions
+			sender.sendMessage(Plugin.LOG_PREFIX.append(Component.text(playerName + " owns " + ownerRegions.size() + " plots:")));
+			for (var region : ownerRegions) {
+				var text = formatRegion(region, world);
+				sender.sendMessage(text);
+			}
+
+			if (memberRegions.size() > 0) {
+				sender.sendMessage(Plugin.LOG_PREFIX.append(Component.text(playerName + " is a member of " + memberRegions.size() + " plots:")));
+				for (var region : memberRegions) {
 					var text = formatRegion(region, world);
 					sender.sendMessage(text);
 				}
-
-				if (memberRegions.size() > 0) {
-					sender.sendMessage(Plugin.LOG_PREFIX + playerName + " is a member of " + memberRegions.size() + " plots:");
-					for (var region : memberRegions) {
-						var text = formatRegion(region, world);
-						sender.sendMessage(text);
-					}
-				}
-
-				return true;
 			}
+
+			return true;
 		};
 	}
 

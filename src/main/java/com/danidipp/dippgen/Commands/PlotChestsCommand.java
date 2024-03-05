@@ -50,7 +50,7 @@ public class PlotChestsCommand implements ICommandImpl {
 
 			var inventoryBlocks = getContainers(plot.region(), plot.world());
 
-			sender.sendMessage(Plugin.LOG_PREFIX + "Found " + inventoryBlocks.size() + " inventories in plot " + plotId + ":");
+			sender.sendMessage(Plugin.LOG_PREFIX.append(Component.text("Found " + inventoryBlocks.size() + " inventories in plot " + plotId + ":")));
 			for (var inventoryBlock : inventoryBlocks) { sender.sendMessage(formatBlock(inventoryBlock)); }
 
 			return true;

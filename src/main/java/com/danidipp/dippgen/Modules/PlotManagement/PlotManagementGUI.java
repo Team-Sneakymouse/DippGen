@@ -25,6 +25,7 @@ import com.danidipp.dippgen.Plugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 public class PlotManagementGUI {
 	public static InventoryHolder plotManagementInventoryHolder = new InventoryHolder() {
@@ -74,10 +75,10 @@ public class PlotManagementGUI {
 				return;
 			}
 
-			if (slot == 7) {
-				this.toggleLock(event, plot);
-				return;
-			}
+			// if (slot == 7) {
+			// 	this.toggleLock(event, plot);
+			// 	return;
+			// }
 			if (slot == 8) {
 				this.abandonPlot(event, plot);
 				return;
@@ -93,14 +94,14 @@ public class PlotManagementGUI {
 			}
 		}
 
-		void toggleLock(InventoryClickEvent event, Plot plot) {
-			var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
-			var isUnlocked = unlockedFlag == null ? false : unlockedFlag.booleanValue();
+		// void toggleLock(InventoryClickEvent event, Plot plot) {
+		// 	var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
+		// 	var isUnlocked = unlockedFlag == null ? false : unlockedFlag.booleanValue();
 
-			plot.region().setFlag(Plot.plotUnlockedFlag, !isUnlocked);
+		// 	plot.region().setFlag(Plot.plotUnlockedFlag, !isUnlocked);
 
-			event.getClickedInventory().setItem(8, IconUtil.lockToggle(plot));
-		}
+		// 	event.getClickedInventory().setItem(8, IconUtil.lockToggle(plot));
+		// }
 
 		void abandonPlot(InventoryClickEvent event, Plot plot) {
 			if (!(event.getWhoClicked() instanceof Player)) {
@@ -183,12 +184,17 @@ class IconUtil {
 		var owner = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : null;
 		var ownerName = owner != null ? owner.getName() : "Not Owned";
 		var ownedPlots = Plot.getOwnedPlots(ownerUUID);
-
 		meta.setOwningPlayer(owner);
-		meta.displayName(Component.text("Plot Owner", NamedTextColor.AQUA));
-		meta.lore(List.of(Component.text(ownerName, NamedTextColor.GOLD),
-				Component.text("Plot slots used: ").append(Component.text(ownedPlots.size(), NamedTextColor.YELLOW)
-						.append(Component.text("/", NamedTextColor.GRAY)).append(Component.text(Plot.getPlotLimit(owner), NamedTextColor.YELLOW)))));
+
+		var titleComponent = Component.text("Plot Owner", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false);
+		var nameComponent = Component.text(ownerName, NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false);
+		var plotCountComponent = Component.text("Plot slots used: ", NamedTextColor.WHITE)
+				.append(Component.text(ownedPlots.size(), NamedTextColor.YELLOW))
+				.append(Component.text("/", NamedTextColor.GRAY))
+				.append(Component.text(Plot.getPlotLimit(owner), NamedTextColor.YELLOW))
+				.decoration(TextDecoration.ITALIC, false);
+		meta.displayName(titleComponent);
+		meta.lore(List.of(nameComponent, plotCountComponent));
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		item.setItemMeta(meta);
 		return item;
@@ -205,54 +211,62 @@ class IconUtil {
 
 		var districtLore = Component
 				.text("District: ", NamedTextColor.WHITE)
-				.append(Component.text(plot.district().name(), NamedTextColor.GOLD));
+				.append(Component.text(plot.district().name(), NamedTextColor.GOLD))
+				.decoration(TextDecoration.ITALIC, false);
 		var membersLore = Component
 				.text("Members: ", NamedTextColor.WHITE)
 				.append(Component.text(memberCount, NamedTextColor.GOLD))
 				.append(Component.text("/", NamedTextColor.GRAY))
-				.append(Component.text(maxMembers, NamedTextColor.GOLD));
+				.append(Component.text(maxMembers, NamedTextColor.GOLD))
+				.decoration(TextDecoration.ITALIC, false);
 		// var lockLore = "§fLock Status: " + (isUnlocked ? "§cUnlocked" : "§5Locked");
 		// var lockLore2 = "§7While the deed is unlocked, you can throw it to";
 		// var lockLore3 = "§7another player to transfer plot ownership to them.";
-		meta.displayName(Component.text("Plot Info", NamedTextColor.AQUA));
+		meta.displayName(Component.text("Plot Info", NamedTextColor.AQUA).decoration(TextDecoration.ITALIC, false));
 		meta.lore(List.of(districtLore, membersLore/*, lockLore, lockLore2, lockLore3 */));
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		item.setItemMeta(meta);
 		return item;
 	}
 
-	static ItemStack lockToggle(Plot plot) {
-		var item = new ItemStack(Material.JIGSAW);
-		var meta = item.getItemMeta();
+	// static ItemStack lockToggle(Plot plot) {
+	// 	var item = new ItemStack(Material.JIGSAW);
+	// 	var meta = item.getItemMeta();
 
-		var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
-		var lock = unlockedFlag != null ? unlockedFlag.booleanValue() : false;
+	// 	var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
+	// 	var lock = unlockedFlag != null ? unlockedFlag.booleanValue() : false;
 
-		var toggleName = lock ? Component.text("Deed Unlocked", NamedTextColor.RED) : Component.text("Deed Locked", NamedTextColor.AQUA);
-		var toggleLore = lock
-				? List.of(Component.text("Click here to lock the deed again", NamedTextColor.YELLOW))
-				: List.of(
-						Component.text("Click to unlock this deed", NamedTextColor.YELLOW),
-						Component.text("Give the unlocked deed to someone", NamedTextColor.GRAY),
-						Component.text("else to transfer the plot to them."));
+	// 	var toggleName = lock ? Component.text("Deed Unlocked", NamedTextColor.RED) : Component.text("Deed Locked", NamedTextColor.AQUA);
+	// 	var toggleLore = lock
+	// 			? List.of(Component.text("Click here to lock the deed again", NamedTextColor.YELLOW))
+	// 			: List.of(
+	// 					Component.text("Click to unlock this deed", NamedTextColor.YELLOW),
+	// 					Component.text("Give the unlocked deed to someone", NamedTextColor.GRAY),
+	// 					Component.text("else to transfer the plot to them."));
 
-		meta.displayName(toggleName);
-		meta.lore(toggleLore);
-		meta.setCustomModelData(lock ? 235 : 234);
-		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
-		item.setItemMeta(meta);
-		return item;
-	}
+	// 	meta.displayName(toggleName);
+	// 	meta.lore(toggleLore);
+	// 	meta.setCustomModelData(lock ? 235 : 234);
+	// 	meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
+	// 	item.setItemMeta(meta);
+	// 	return item;
+	// }
 
 	static ItemStack abandonPlot(Plot plot) {
 		var item = new ItemStack(Material.BARRIER);
 		var meta = item.getItemMeta();
 
-		meta.displayName(Component.text("Abandon Plot", NamedTextColor.RED));
-		meta.lore(List.of(
+		var titleComponent = Component.text("Abandon Plot", NamedTextColor.RED)
+				.decoration(TextDecoration.ITALIC, false);
+		var loreComponents = List.of(
 				Component.text("Click to abandon this plot", NamedTextColor.YELLOW),
 				Component.text("This will remove all members and", NamedTextColor.GRAY),
-				Component.text("make the plot available for purchase.", NamedTextColor.GRAY)));
+				Component.text("make the plot available for purchase.", NamedTextColor.GRAY),
+				Component.text("You'll also get the member points back.", NamedTextColor.GRAY));
+		loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
+
+		meta.displayName(titleComponent);
+		meta.lore(loreComponents);
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 		item.setItemMeta(meta);
 		return item;
@@ -265,11 +279,13 @@ class IconUtil {
 		if (player.getName() != null) {
 			meta.setOwningPlayer(player);
 		}
-		meta.displayName(Component.text(player.getName(), NamedTextColor.GOLD));
-		meta.lore(List.of(
+		meta.displayName(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
+		var loreComponents = List.of(
 				Component.text("Click to remove them from the plot", NamedTextColor.YELLOW),
 				Component.text("Additional memberslots can be", NamedTextColor.GRAY),
-				Component.text("acquired from Skill Trees", NamedTextColor.GRAY)));
+				Component.text("acquired from Skill Trees", NamedTextColor.GRAY));
+		loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
+		meta.lore(loreComponents);
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 
 		item.setItemMeta(meta);
@@ -280,10 +296,10 @@ class IconUtil {
 		var item = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 		var meta = item.getItemMeta();
 
-		meta.displayName(Component.text("Add Member", NamedTextColor.YELLOW));
+		meta.displayName(Component.text("Add Member", NamedTextColor.YELLOW).decoration(TextDecoration.ITALIC, false));
 		meta.lore(List.of(
-				Component.text("Additional member slots can be", NamedTextColor.GRAY),
-				Component.text("acquired from Skill Trees", NamedTextColor.GRAY)));
+				Component.text("Additional member slots can be", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
+				Component.text("acquired from Skill Trees", NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
 
 		item.setItemMeta(meta);
