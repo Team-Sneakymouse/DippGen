@@ -4,6 +4,10 @@
   "description": "description",
   "type": "object",
   "properties": {
+    "server_name": {
+      "description": "Name of the server (for log-shipping)",
+      "type": "string"
+    },
     "replacements": {
       "description": "List of blocks that will be replaced when broken",
       "type": "object",

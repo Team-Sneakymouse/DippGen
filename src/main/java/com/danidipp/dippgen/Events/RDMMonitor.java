@@ -20,6 +20,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public class RDMMonitor implements Listener {
 	public boolean limitPlayerDamage(Player player) {
+		if (player.hasPermission("dipp.rdmbypass")) return false;
 		var playtimeString = PlaceholderAPI.setPlaceholders(player, "%cmi_user_playtime_hourst%");
 		try {
 			var playtime = Float.parseFloat(playtimeString);

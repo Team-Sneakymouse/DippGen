@@ -65,6 +65,11 @@
       <artifactId>gson</artifactId>     
       <version>2.10.1</version>     
     </dependency>     -->
+    <dependency>
+      <groupId>io.github.mjfryc</groupId>
+      <artifactId>mjaron-tinyloki-java</artifactId>
+      <version>0.3.11</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
@@ -83,6 +88,27 @@
         <artifactId>maven-install-plugin</artifactId>
         <version>2.5.2</version>
       </plugin>
+      <plugin>
+        <!-- Shade plugin to include dependencies in the jar -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.2.4</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <filters>
+                  <filter>
+                    <artifact>io.github.mjfryc:mjaron-tinyloki-java</artifact>
+                  </filter>
+                </filters>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       <plugin>
         <!-- Restart dev server via rcon -->
         <groupId>org.codehaus.mojo</groupId>

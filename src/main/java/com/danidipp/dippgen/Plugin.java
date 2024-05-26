@@ -31,9 +31,14 @@ import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import pl.mjaron.tinyloki.ILogStream;
+import pl.mjaron.tinyloki.LogController;
+import pl.mjaron.tinyloki.TinyLoki;
 
 public class Plugin extends JavaPlugin {
     public static Plugin plugin;
+    private LogController lokiLogger;
+    public ILogStream lokiChatStream;
     public List<Replacement> replacements;
     public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
@@ -63,6 +68,11 @@ public class Plugin extends JavaPlugin {
 
         this.parseConfig();
         getLogger().info("Config Loaded!");
+
+        this.lokiLogger = TinyLoki.withUrl("http://grafana-loki:3100/loki/api/v1/push").start();
+        this.lokiChatStream = this.lokiLogger.createStream(
+                TinyLoki.l("type", "chat")
+                        .l("server", this.getConfig().getString("server_name")));
 
         var count = this.registerCommands();
         getLogger().info("Registered " + count + "commands!");
@@ -105,6 +115,7 @@ public class Plugin extends JavaPlugin {
     @Override
     public void onDisable() {
         getLogger().info("Plugin is Disabling!");
+        lokiLogger.softStop().hardStop();
     }
 
     public void parseConfig() {

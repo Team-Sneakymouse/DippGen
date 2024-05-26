@@ -50,6 +50,20 @@ public class Chat implements Listener {
 		NORMAL, SHOUT, GLOBAL
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void sendChatToLoki(AsyncChatEvent event) {
+		var username = PlaceholderAPI.setPlaceholders(event.getPlayer(), "%sneakycharacters_character_name%");
+		if (username == null || username == "%sneakycharacters_character_name%" || username.isBlank()) {
+			username = event.getPlayer().getName();
+		}
+		var positionX = event.getPlayer().getLocation().getX();
+		var positionY = event.getPlayer().getLocation().getY();
+		var positionZ = event.getPlayer().getLocation().getZ();
+		var message = PlainTextComponentSerializer.plainText().serialize(event.message());
+		Plugin.plugin.lokiChatStream.log("{ \"username\": \"" + username + "\", \"positionX\": " + positionX + ", \"positionY\": " + positionY
+				+ ", \"positionZ\": " + positionZ + ", \"message\": \"" + message + "\" }");
+	}
+
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onPlayerChat(AsyncChatEvent event) {
 		var plainText = PlainTextComponentSerializer.plainText().serialize(event.message());

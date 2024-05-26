@@ -1,5 +1,6 @@
 # yaml-language-server: $schema=../../../schemas/config.schema.json
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Team-Sneakymouse/DippGen/main/schemas/config.schema.json
+server_name: lom-dev
 replacements:
   ore:
     blocks:
