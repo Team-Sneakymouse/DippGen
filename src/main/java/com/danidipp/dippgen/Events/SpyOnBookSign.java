@@ -30,22 +30,23 @@ public class SpyOnBookSign implements Listener {
 			}
 		}, 12000); // 10 mins
 
-		var playerText = event.getPlayer().displayName().color(NamedTextColor.YELLOW);
-		playerText.hoverEvent(HoverEvent.showText(Component.text("Teleport to player")));
-		playerText.clickEvent(ClickEvent.runCommand("/minecraft:tp " + event.getPlayer().getName()));
+		var playerText = event.getPlayer().displayName().color(NamedTextColor.YELLOW)
+				.hoverEvent(HoverEvent.showText(Component.text("Teleport to player")))
+				.clickEvent(ClickEvent.runCommand("/minecraft:tp " + event.getPlayer().getName()));
 
-		var bookText = bookMeta.title().color(NamedTextColor.GOLD);
-		bookText.hoverEvent(HoverEvent.showItem(Material.WRITTEN_BOOK.getKey().key(), 1, BinaryTagHolder.binaryTagHolder(bookMeta.getAsString())));
-		bookText.clickEvent(ClickEvent.runCommand("/" + Plugin.plugin.getName() + ":showbook " + bookId));
+		var bookNbt = BinaryTagHolder.binaryTagHolder(bookMeta.getAsString());
+		var bookText = bookMeta.title().color(NamedTextColor.GOLD)
+				.hoverEvent(HoverEvent.showItem(Material.WRITTEN_BOOK.getKey().key(), 1, bookNbt))
+				.clickEvent(ClickEvent.runCommand("/" + Plugin.plugin.getName() + ":showbook " + bookId));
 
-		var text = Plugin.LOG_PREFIX;
-		text.append(playerText);
-		text.append(Component.text(" signed book "));
-		text.append(bookText);
+		var message = Plugin.LOG_PREFIX
+				.append(playerText)
+				.append(Component.text(" signed book "))
+				.append(bookText);
 
 		for (var player : Bukkit.getServer().getOnlinePlayers()) {
 			if (player.hasPermission("dipp.bookspy")) {
-				player.sendMessage(text);
+				player.sendMessage(message);
 			}
 		}
 
