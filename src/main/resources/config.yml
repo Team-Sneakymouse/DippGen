@@ -11,6 +11,7 @@ replacements:
     coordinates:
       - -414 68 -317
       - -412 68 -317
+    regions: []
   global_flowers:
     blocks:
       - material: GRASS
@@ -66,3 +67,4 @@ replacements:
     minDelay: 30
     maxDelay: 60
     coordinates: []
+    regions: []

@@ -26,8 +26,10 @@ import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed;
 import com.danidipp.dippgen.Modules.PlotManagement.PlotManagementGUI;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -89,6 +91,7 @@ public class Plugin extends JavaPlugin {
         }
         getLogger().info("Registered placeholders!");
 
+        // Refresh all replacements
         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
             @Override
             public void run() {
@@ -100,7 +103,8 @@ public class Plugin extends JavaPlugin {
                                 location.getBlock().setType(replacement.getRandomMaterial());
 
                             }
-                            if (replacement.name().startsWith("global_")) {
+                            if (replacement.regions().size() > 0) {
+                                // region-based replacements shouldn't have persistent locations
                                 replacement.locations().clear();
                                 Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
                                 Plugin.plugin.saveConfig();
@@ -150,17 +154,34 @@ public class Plugin extends JavaPlugin {
             List<Location> locations = new ArrayList<Location>(configLocations.size());
             for (String configLocation : configLocations) {
                 var stringCoordinations = configLocation.split(" ");
-                int x = Integer.parseInt(stringCoordinations[0]);
-                int y = Integer.parseInt(stringCoordinations[1]);
-                int z = Integer.parseInt(stringCoordinations[2]);
-                Location location = new Location(Bukkit.getServer().getWorlds().get(0), x, y, z);
-                locations.add(location);
+                try {
+                    int x = Integer.parseInt(stringCoordinations[0]);
+                    int y = Integer.parseInt(stringCoordinations[1]);
+                    int z = Integer.parseInt(stringCoordinations[2]);
+                    Location location = new Location(Bukkit.getServer().getWorlds().get(0), x, y, z);
+                    locations.add(location);
+                } catch (NumberFormatException e) {
+                    getLogger().warning("Failed to parse location for replacement " + replacementName + ": " + configLocation);
+                }
+
+            }
+            List<String> configRegions = (List<String>) configReplacement.getStringList("regions");
+            List<ProtectedRegion> regions = new ArrayList<ProtectedRegion>();
+            var wgWorld = BukkitAdapter.adapt(Bukkit.getWorld("world"));
+            getLogger().warning("Regions: " + configRegions.toString());
+            for (String configRegion : configRegions) {
+                var region = WorldGuard.getInstance().getPlatform().getRegionContainer().get(wgWorld).getRegion(configRegion);
+                if (region == null) {
+                    getLogger().warning("Unknown region for replacement " + replacementName + ": " + configRegion);
+                    continue;
+                }
+                regions.add(region);
             }
 
             var minDelay = configReplacement.contains("minDelay") ? configReplacement.getLong("minDelay") : 120;
             var maxDelay = configReplacement.contains("maxDelay") ? configReplacement.getLong("maxDelay") : 120;
 
-            this.replacements.add(new Replacement(replacementName, blocks, minDelay * 20, maxDelay * 20, locations));
+            this.replacements.add(new Replacement(replacementName, blocks, minDelay * 20, maxDelay * 20, locations, regions));
         }
         getLogger().warning(this.replacements.toString());
 

@@ -1,10 +1,7 @@
 package com.danidipp.dippgen;
 
-import java.util.Collection;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import com.danidipp.dippgen.Modules.PlotManagement.District;

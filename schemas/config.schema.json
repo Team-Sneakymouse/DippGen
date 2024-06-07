@@ -38,6 +38,14 @@
               "type": "string",
               "pattern": "^-?\\d+ -?\\d+ -?\\d+$"
             }
+          },
+          "regions": {
+            "description": "Regions to replace blocks in",
+            "type": "array",
+            "items": {
+              "description": "region name in world \"world\"",
+              "type": "string"
+            }
           }
       }
     }

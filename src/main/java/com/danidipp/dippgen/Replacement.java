@@ -10,7 +10,10 @@ import java.util.stream.Collectors;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-public record Replacement(String name, Set<ReplacementBlock> blocks, long minDelay, long maxDelay, List<Location> locations) {
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+public record Replacement(String name, Set<ReplacementBlock> blocks, long minDelay, long maxDelay, List<Location> locations,
+		List<ProtectedRegion> regions) {
 
 	public Material getRandomMaterial() {
 		if (this.blocks.size() == 0)
@@ -35,6 +38,7 @@ public record Replacement(String name, Set<ReplacementBlock> blocks, long minDel
 		map.put("minDelay", minDelay / 20);
 		map.put("maxDelay", maxDelay / 20);
 		map.put("coordinates", locations.stream().map(l -> l.getBlockX() + " " + l.getBlockY() + " " + l.getBlockZ()).collect(Collectors.toList()));
+		map.put("regions", regions.stream().map(ProtectedRegion::getId).collect(Collectors.toList()));
 
 		return map;
 	}

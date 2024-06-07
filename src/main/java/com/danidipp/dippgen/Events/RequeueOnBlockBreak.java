@@ -27,17 +27,20 @@ public class RequeueOnBlockBreak implements Listener {
         if (event.isCancelled()) return;
         for (var replacement : Plugin.plugin.replacements) {
             var matchesLocation = replacement.locations().stream().anyMatch(l -> l.equals(event.getBlock().getLocation()));
-            var matchesGlobalType = replacement.name().startsWith("global_")
+            var matchesRegion = replacement.regions().stream()
+                    .anyMatch(r -> r.contains(event.getBlock().getLocation().getBlockX(), event.getBlock().getLocation().getBlockY(),
+                            event.getBlock().getLocation().getBlockZ()))
                     && replacement.blocks().stream().anyMatch(b -> b.material().equals(event.getBlock().getType()))
                     && Plot.getPlot(event.getBlock().getLocation()) == null;
-            if (matchesLocation || matchesGlobalType) {
+            if (matchesLocation || matchesRegion) {
                 // Bukkit.broadcastMessage("Location match: " + event.getBlock().getLocation());
                 var min = replacement.minDelay();
                 var max = replacement.maxDelay();
                 var delay = min == max ? min : new Random().nextLong(max - min) + min;
                 var newMaterial = replacement.getRandomMaterial();
 
-                if (matchesGlobalType) {
+                if (!matchesLocation) {
+                    // add location to config so it persists through restarts
                     replacement.locations().add(event.getBlock().getLocation());
                     Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
                     Plugin.plugin.saveConfig();
@@ -47,7 +50,7 @@ public class RequeueOnBlockBreak implements Listener {
                     public void run() {
                         Plugin.plugin.getLogger().log(Level.FINE, "Ran task");
                         event.getBlock().setType(newMaterial);
-                        if (matchesGlobalType) {
+                        if (!matchesLocation) {
                             replacement.locations().remove(event.getBlock().getLocation());
                             Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
                             Plugin.plugin.saveConfig();
