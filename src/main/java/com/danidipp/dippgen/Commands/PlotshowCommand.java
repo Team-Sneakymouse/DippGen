@@ -87,21 +87,20 @@ public class PlotshowCommand implements ICommandImpl {
 		while (world.getBlockAt(regionCenter.getBlockX(), centerY, regionCenter.getBlockZ()).isPassable()) { centerY--; }
 		regionCenter = regionCenter.withY(centerY + 1);
 
-		var infoComponent = Component.text("[info]", NamedTextColor.YELLOW);
-		infoComponent.hoverEvent(HoverEvent.showText(Component.text("Show plot info")));
-		infoComponent.clickEvent(ClickEvent.runCommand("/rg info -w " + world.getName() + " " + region.getId()));
+		var infoComponent = Component.text("[info]", NamedTextColor.YELLOW)
+				.hoverEvent(HoverEvent.showText(Component.text("Show plot info")))
+				.clickEvent(ClickEvent.runCommand("/rg info -w " + world.getName() + " " + region.getId()));
 
-		var teleportComponent = Component.text("[tp]", NamedTextColor.YELLOW);
-		teleportComponent.hoverEvent(HoverEvent.showText(Component.text("Teleport to plot")));
-		teleportComponent.clickEvent(ClickEvent
-				.runCommand("/minecraft:tp @s " + regionCenter.getBlockX() + " " + regionCenter.getBlockY() + " " + regionCenter.getBlockZ()));
+		var tpCommand = "/minecraft:tp @s " + regionCenter.getBlockX() + " " + regionCenter.getBlockY() + " " + regionCenter.getBlockZ();
+		var teleportComponent = Component.text("[tp]", NamedTextColor.YELLOW)
+				.hoverEvent(HoverEvent.showText(Component.text("Teleport to plot")))
+				.clickEvent(ClickEvent.runCommand(tpCommand));
 
-		var chestsComponent = Component.text("[chests]");
 		var hasContainers = PlotChestsCommand.getContainers(region, world).size() > 0;
-		chestsComponent.color(hasContainers ? NamedTextColor.YELLOW : NamedTextColor.GRAY);
-		chestsComponent.hoverEvent(HoverEvent.showText(Component.text(hasContainers ? "Show plot chests" : "No chests found")));
-		if (hasContainers)
-			chestsComponent.clickEvent(ClickEvent.runCommand("/dippgen:plotchests " + world.getName() + ":" + region.getId()));
+		var chestsComponent = Component.text("[chests]")
+				.color(hasContainers ? NamedTextColor.YELLOW : NamedTextColor.GRAY)
+				.hoverEvent(HoverEvent.showText(Component.text(hasContainers ? "Show plot chests" : "No chests found")))
+				.clickEvent(hasContainers ? ClickEvent.runCommand("/dippgen:plotchests " + world.getName() + ":" + region.getId()) : null);
 
 		var text = Component.textOfChildren(Component.text("- " + region.getId() + " "), infoComponent, Component.space(), teleportComponent,
 				Component.space(), chestsComponent);

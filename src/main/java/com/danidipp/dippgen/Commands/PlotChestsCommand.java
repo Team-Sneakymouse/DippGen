@@ -92,15 +92,16 @@ public class PlotChestsCommand implements ICommandImpl {
 		var slotsUsed = Arrays.stream(container.getInventory().getContents()).filter(item -> item != null).count();
 		var maxSlots = container.getInventory().getSize();
 
+		var containerCommand = "/dippgen:opencontainer " + pos.getWorld().getName() + " " + pos.getBlockX() + " " + pos.getBlockY() + " "
+				+ pos.getBlockZ();
 		TextComponent text = Component.textOfChildren(name, Component.space(), Component.text("[", NamedTextColor.DARK_GRAY),
 				Component.text(pos.getBlockX(), NamedTextColor.GRAY), Component.text(", ", NamedTextColor.DARK_GRAY),
 				Component.text(pos.getBlockY(), NamedTextColor.GRAY), Component.text(", ", NamedTextColor.DARK_GRAY),
 				Component.text(pos.getBlockZ(), NamedTextColor.GRAY), Component.text("]: ", NamedTextColor.DARK_GRAY),
 				Component.text(slotsUsed, NamedTextColor.YELLOW), Component.text("/", NamedTextColor.WHITE),
-				Component.text(maxSlots, NamedTextColor.YELLOW));
-		text.hoverEvent(HoverEvent.showText(Component.text("Click to open")));
-		text.clickEvent(ClickEvent.runCommand(
-				"/dippgen:opencontainer " + pos.getWorld().getName() + " " + pos.getBlockX() + " " + pos.getBlockY() + " " + pos.getBlockZ()));
+				Component.text(maxSlots, NamedTextColor.YELLOW))
+				.hoverEvent(HoverEvent.showText(Component.text("Click to open")))
+				.clickEvent(ClickEvent.runCommand(containerCommand));
 		return text;
 	}
 
