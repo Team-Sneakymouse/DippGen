@@ -31,6 +31,7 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import pl.mjaron.tinyloki.ILogStream;
@@ -44,6 +45,7 @@ public class Plugin extends JavaPlugin {
     public List<Replacement> replacements;
     public Map<Player, String> replacementRegistrationEnabled;
     public Map<String, BookMeta> recentBooks;
+    public Map<Player, ScheduledTask> autoPickup;
 
     public static Component LOG_PREFIX = Component.text("[", NamedTextColor.GRAY).append(Component.text("DIPP", NamedTextColor.AQUA))
             .append(Component.text("] ", NamedTextColor.GRAY));
@@ -66,6 +68,7 @@ public class Plugin extends JavaPlugin {
         Plugin.plugin = this;
         this.replacementRegistrationEnabled = new HashMap<>();
         this.recentBooks = new HashMap<>();
+        this.autoPickup = new HashMap<>();
         getLogger().info("Plugin is Starting!");
 
         this.parseConfig();

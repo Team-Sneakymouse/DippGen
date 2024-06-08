@@ -39,3 +39,7 @@ commands:
         description: Opens homestone management GUI for player
         permission: dipp.commands.homestone
         usage: /<command> <player>
+    autopickup:
+        description: Toggles autopickup
+        permission: dipp.commands.autopickup
+        usage: /<command> <player> [duration]
