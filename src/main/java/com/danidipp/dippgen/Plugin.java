@@ -55,8 +55,6 @@ public class Plugin extends JavaPlugin {
         getLogger().info("Plugin is Loading!");
         WorldGuard worldGuard = WorldGuard.getInstance();
         FlagRegistry flagRegistry = worldGuard.getFlagRegistry();
-
-        flagRegistry.register(Plot.maxMembersFlag);
         flagRegistry.register(Plot.plotUnlockedFlag);
         flagRegistry.register(Plot.teleportLocationFlag);
         flagRegistry.register(BreedAnimalsFlag.breedAnimalsFlag);

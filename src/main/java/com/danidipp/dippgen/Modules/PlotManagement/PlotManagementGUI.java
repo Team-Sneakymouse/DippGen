@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.danidipp.dippgen.Plugin;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -35,9 +36,22 @@ public class PlotManagementGUI {
 		}
 	};
 
+	public static int getMemberLimit(OfflinePlayer player) {
+		if (!player.isConnected()) return 1;
+		var maxMembersString = PlaceholderAPI.setPlaceholders(player, "%ms_variable_statPlotFriends%");
+		try {
+			return (int) Float.parseFloat(maxMembersString);
+		} catch (NumberFormatException e) {
+			return 1;
+		}
+	}
+
 	public static Inventory create(Plot plot, Player player) {
 		var plotName = plot.region().getId().split("-")[1];
-		var inventory = Bukkit.createInventory(PlotManagementGUI.plotManagementInventoryHolder, 2 * 9,
+		OfflinePlayer owner = Bukkit.getOfflinePlayer(plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null));
+		var maxMembers = Math.min(getMemberLimit(owner), 5 * 9); // hard limit due to inventory size
+		var rows = (9 + (1 + maxMembers / 9) * 9);
+		var inventory = Bukkit.createInventory(PlotManagementGUI.plotManagementInventoryHolder, rows,
 				Component.text("Plot Management: " + plotName, NamedTextColor.GOLD));
 		inventory.setItem(0, IconUtil.plotOwner(plot));
 		inventory.setItem(1, IconUtil.plotInfo(plot));
@@ -46,7 +60,7 @@ public class PlotManagementGUI {
 
 		var uuids = plot.region().getMembers().getUniqueIds().stream().toList();
 		for (var i = 0; i < uuids.size(); i++) { inventory.setItem(9 + i, IconUtil.memberPortrait(Bukkit.getOfflinePlayer(uuids.get(i)), plot)); }
-		for (var i = uuids.size(); i < plot.getMemberLimit(); i++) { inventory.setItem(9 + i, IconUtil.addMember(plot)); }
+		for (var i = uuids.size(); i < getMemberLimit(owner); i++) { inventory.setItem(9 + i, IconUtil.addMember(plot)); }
 
 		return inventory;
 	}
@@ -112,7 +126,6 @@ public class PlotManagementGUI {
 
 			plot.region().getMembers().removeAll();
 			plot.region().getOwners().removeAll();
-			plot.region().setFlag(Plot.maxMembersFlag, 1);
 			plot.region().setFlag(Plot.teleportLocationFlag, null);
 			plot.region().setFlag(Plot.plotUnlockedFlag, false);
 
@@ -205,7 +218,8 @@ class IconUtil {
 		var meta = item.getItemMeta();
 
 		var memberCount = plot.region().getMembers().size();
-		var maxMembers = plot.getMemberLimit();
+		var owner = Bukkit.getOfflinePlayer(plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null));
+		var maxMembers = PlotManagementGUI.getMemberLimit(owner);
 		//var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
 		//var isUnlocked = unlockedFlag != null ? unlockedFlag.booleanValue() : false;
 
@@ -261,8 +275,7 @@ class IconUtil {
 		var loreComponents = List.of(
 				Component.text("Click to abandon this plot", NamedTextColor.YELLOW),
 				Component.text("This will remove all members and", NamedTextColor.GRAY),
-				Component.text("make the plot available for purchase.", NamedTextColor.GRAY),
-				Component.text("You'll also get the member points back.", NamedTextColor.GRAY));
+				Component.text("make the plot available for purchase.", NamedTextColor.GRAY));
 		loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
 
 		meta.displayName(titleComponent);
@@ -282,7 +295,7 @@ class IconUtil {
 		meta.displayName(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
 		var loreComponents = List.of(
 				Component.text("Click to remove them from the plot", NamedTextColor.YELLOW),
-				Component.text("Additional memberslots can be", NamedTextColor.GRAY),
+				Component.text("Additional member slots can be", NamedTextColor.GRAY),
 				Component.text("acquired from Skill Trees", NamedTextColor.GRAY));
 		loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
 		meta.lore(loreComponents);

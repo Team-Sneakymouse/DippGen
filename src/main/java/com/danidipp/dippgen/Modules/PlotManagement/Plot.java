@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.BooleanFlag;
-import com.sk89q.worldguard.protection.flags.IntegerFlag;
 import com.sk89q.worldguard.protection.flags.LocationFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
@@ -24,7 +23,6 @@ import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 public record Plot(ProtectedRegion region, @Nullable District district, World world) {
 
-	public static IntegerFlag maxMembersFlag = new IntegerFlag("max-members");
 	public static BooleanFlag plotUnlockedFlag = new BooleanFlag("plot-unlocked");
 	public static LocationFlag teleportLocationFlag = new LocationFlag("teleport-location");
 
@@ -129,10 +127,5 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 
 	public String getName() {
 		return this.region().getId().split("-")[1];
-	}
-
-	public int getMemberLimit() {
-		var maxMembersFlag = this.region.getFlag(Plot.maxMembersFlag);
-		return maxMembersFlag != null ? maxMembersFlag.intValue() : 1;
 	}
 }

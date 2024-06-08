@@ -13,6 +13,8 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.block.data.Waterlogged;
 
 public class RequeueOnBlockBreak implements Listener {
 
@@ -49,7 +51,13 @@ public class RequeueOnBlockBreak implements Listener {
                 TimerTask task = new TimerTask() {
                     public void run() {
                         Plugin.plugin.getLogger().log(Level.FINE, "Ran task");
+                        var oldMaterial = event.getBlock().getType();
                         event.getBlock().setType(newMaterial);
+                        var data = event.getBlock().getBlockData();
+                        if (data instanceof Waterlogged) {
+                            ((Waterlogged) data).setWaterlogged(oldMaterial == Material.WATER);
+                            event.getBlock().setBlockData(data);
+                        }
                         if (!matchesLocation) {
                             replacement.locations().remove(event.getBlock().getLocation());
                             Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
