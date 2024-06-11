@@ -37,6 +37,7 @@ public class RDMMonitor implements Listener {
 		var victim = event.getEntity();
 
 		if (!(damager instanceof Player) || !(victim instanceof Player)) return;
+		if (victim == damager) return;
 		if (limitPlayerDamage((Player) damager)) event.setCancelled(true);
 	}
 
