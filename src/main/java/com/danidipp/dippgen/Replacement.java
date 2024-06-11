@@ -9,13 +9,20 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.Waterlogged;
+import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.PinkPetals;
+import org.checkerframework.checker.units.qual.t;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 public record Replacement(String name, Set<ReplacementBlock> blocks, long minDelay, long maxDelay, List<Location> locations,
 		List<ProtectedRegion> regions) {
 
-	public Material getRandomMaterial() {
+	private Material getRandomMaterial() {
 		if (this.blocks.size() == 0)
 			throw new IllegalStateException("Can't select a block from an empty list");
 
@@ -30,6 +37,35 @@ public record Replacement(String name, Set<ReplacementBlock> blocks, long minDel
 		}
 
 		throw new IllegalStateException("Unable to select a material");
+	}
+
+	public void placeBlock(Block block) {
+		var oldMaterial = block.getType();
+		var newMaterial = getRandomMaterial();
+		block.setType(newMaterial, false);
+		var data = block.getBlockData();
+		if (data instanceof Waterlogged) {
+			((Waterlogged) data).setWaterlogged(oldMaterial == Material.WATER);
+			block.setBlockData(data, false);
+		}
+
+		if (data instanceof Bisected) {
+			((Bisected) data).setHalf(Half.BOTTOM);
+			var topBlock = block.getRelative(BlockFace.UP);
+			if (topBlock.getType().isAir()) {
+				topBlock.setType(newMaterial, false);
+				var topData = topBlock.getBlockData();
+				((Bisected) topData).setHalf(Half.TOP);
+				topBlock.setBlockData(topData, false);
+			}
+		}
+
+		if (newMaterial == Material.PINK_PETALS) {
+			var count = new Random().nextInt(4) + 1;
+			((PinkPetals) data).setFlowerAmount(count);
+			block.setBlockData(data, false);
+		}
+
 	}
 
 	public Map<String, ?> toMap() {

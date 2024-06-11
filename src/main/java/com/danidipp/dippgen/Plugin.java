@@ -101,7 +101,7 @@ public class Plugin extends JavaPlugin {
                         @Override
                         public void run() {
                             for (var location : replacement.locations()) {
-                                location.getBlock().setType(replacement.getRandomMaterial());
+                                replacement.placeBlock(location.getBlock());
 
                             }
                             if (replacement.regions().size() > 0) {

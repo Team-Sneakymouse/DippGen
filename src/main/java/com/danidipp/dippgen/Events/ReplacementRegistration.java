@@ -81,7 +81,7 @@ public class ReplacementRegistration implements Listener {
 			replacement.locations().add(target);
 			Plugin.plugin.getConfig().set("replacements." + replacement.name(), replacement.toMap());
 			Plugin.plugin.saveConfig();
-			target.getBlock().setType(replacement.getRandomMaterial());
+			replacement.placeBlock(target.getBlock());
 			event.getPlayer().sendMessage("Added " + coordinates + " as replacement");
 			return;
 		}
