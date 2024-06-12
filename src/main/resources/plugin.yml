@@ -21,9 +21,9 @@ commands:
         description: shows book - not to be used manually
         usage: /<command> <hashcode>
     plotshow:
-        description: Displays plot info of player
+        description: Displays info of plot you're standong on, or specific player
         permission: dipp.commands.plotshow
-        usage: /<command> <player>
+        usage: /<command> [player]
     plotchests:
         description: Displays chests and storage within plot
         permission: dipp.commands.plotchests

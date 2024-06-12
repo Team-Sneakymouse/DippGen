@@ -15,6 +15,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import com.danidipp.dippgen.Plugin;
+import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -34,21 +35,37 @@ public class PlotshowCommand implements ICommandImpl {
 	@Override
 	public CommandExecutor getExecutor() {
 		return (sender, command, label, args) -> {
-			if (args.length == 0) return false; // No player name provided
-
-			String playerName = args[0];
 			OfflinePlayer player;
-			try {
-				var uuid = UUID.fromString(playerName);
+			if (args.length == 0) {
+				if (!(sender instanceof Player)) {
+					sender.sendMessage("error: You must be on the server to use this command without specifying a player");
+					return true;
+				}
+				var plot = Plot.getPlot(((Player) sender).getLocation());
+				if (plot == null) {
+					sender.sendMessage("error: You are not in a plot");
+					return true;
+				}
+				var uuid = plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null);
+				if (uuid == null) {
+					sender.sendMessage("error: Plot has no owner");
+					return true;
+				}
 				player = Bukkit.getOfflinePlayer(uuid);
-			} catch (IllegalArgumentException e) {
-				player = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase()))
-						.findFirst().orElse(null);
-			}
+			} else {
+				String playerName = args[0];
+				try {
+					var uuid = UUID.fromString(playerName);
+					player = Bukkit.getOfflinePlayer(uuid);
+				} catch (IllegalArgumentException e) {
+					player = List.of(Bukkit.getOfflinePlayers()).stream().filter(p -> p.getName().toLowerCase().equals(playerName.toLowerCase()))
+							.findFirst().orElse(null);
+				}
 
-			if (player == null) {
-				sender.sendMessage("error: Player " + playerName + " does not exist");
-				return true;
+				if (player == null) {
+					sender.sendMessage("error: Player " + playerName + " does not exist");
+					return true;
+				}
 			}
 
 			// Get all regions
@@ -62,19 +79,34 @@ public class PlotshowCommand implements ICommandImpl {
 			var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
 			var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
 
+			// Display player info
+			var infoComponent = Component.text("[info]", NamedTextColor.YELLOW)
+					.hoverEvent(HoverEvent.showText(Component.text("Show player info")))
+					.clickEvent(ClickEvent.runCommand("/cmi info " + player.getName()));
+
+			var altsComponent = Component.text("[alts]", NamedTextColor.YELLOW)
+					.hoverEvent(HoverEvent.showText(Component.text("Show player alts")))
+					.clickEvent(ClickEvent.runCommand("/cmi checkaccount " + player.getName()));
+
+			var isOnline = player.isOnline();
+			var tpCommand = "/minecraft:tp @s " + player.getName();
+			var teleportComponent = Component.text("[tp]", isOnline ? NamedTextColor.YELLOW : NamedTextColor.GRAY)
+					.hoverEvent(HoverEvent.showText(Component.text(isOnline ? "Teleport to player" : "Player is offline")))
+					.clickEvent(isOnline ? ClickEvent.runCommand(tpCommand) : null);
+
+			sender.sendMessage(Component.textOfChildren(
+					Plugin.LOG_PREFIX, Component.text("Plot info for ", NamedTextColor.GRAY),
+					Component.text(player.getName(), NamedTextColor.WHITE).appendSpace(),
+					infoComponent.appendSpace(),
+					altsComponent.appendSpace(),
+					teleportComponent));
 			// Display regions
-			sender.sendMessage(Plugin.LOG_PREFIX.append(Component.text(playerName + " owns " + ownerRegions.size() + " plots:")));
-			for (var region : ownerRegions) {
-				var text = formatRegion(region, world);
-				sender.sendMessage(text);
-			}
+			sender.sendMessage(Component.text(player.getName() + " owns " + ownerRegions.size() + " plots:", NamedTextColor.GRAY));
+			for (var region : ownerRegions) { sender.sendMessage(formatRegion(region, world)); }
 
 			if (memberRegions.size() > 0) {
-				sender.sendMessage(Plugin.LOG_PREFIX.append(Component.text(playerName + " is a member of " + memberRegions.size() + " plots:")));
-				for (var region : memberRegions) {
-					var text = formatRegion(region, world);
-					sender.sendMessage(text);
-				}
+				sender.sendMessage(Component.text(player.getName() + " is a member of " + memberRegions.size() + " plots:", NamedTextColor.GRAY));
+				for (var region : memberRegions) { sender.sendMessage(formatRegion(region, world, true)); }
 			}
 
 			return true;
@@ -82,6 +114,10 @@ public class PlotshowCommand implements ICommandImpl {
 	}
 
 	Component formatRegion(ProtectedRegion region, World world) {
+		return formatRegion(region, world, false);
+	}
+
+	Component formatRegion(ProtectedRegion region, World world, boolean showOwner) {
 		var regionCenter = region.getMinimumPoint().add(region.getMaximumPoint()).divide(2);
 		var centerY = region.getMaximumPoint().getBlockY();
 		while (world.getBlockAt(regionCenter.getBlockX(), centerY, regionCenter.getBlockZ()).isPassable()) { centerY--; }
@@ -102,8 +138,16 @@ public class PlotshowCommand implements ICommandImpl {
 				.hoverEvent(HoverEvent.showText(Component.text(hasContainers ? "Show plot chests" : "No chests found")))
 				.clickEvent(hasContainers ? ClickEvent.runCommand("/dippgen:plotchests " + world.getName() + ":" + region.getId()) : null);
 
-		var text = Component.textOfChildren(Component.text("- " + region.getId() + " "), infoComponent, Component.space(), teleportComponent,
-				Component.space(), chestsComponent);
+		var ownerName = region.getOwners().getUniqueIds().stream().map(Bukkit::getOfflinePlayer).map(OfflinePlayer::getName).findFirst()
+				.orElse("Unknown");
+		var regionName = showOwner ? Component.text(ownerName + "'s plot", NamedTextColor.WHITE)
+				.hoverEvent(HoverEvent.showText(Component.text(region.getId()))) : Component.text(region.getId(), NamedTextColor.WHITE);
+		var text = Component.textOfChildren(
+				Component.text("- "),
+				regionName, Component.space(),
+				infoComponent, Component.space(),
+				teleportComponent, Component.space(),
+				chestsComponent);
 
 		return text;
 	}
