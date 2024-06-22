@@ -27,7 +27,7 @@ public class DeedCommand implements ICommandImpl {
 				sender.sendMessage("You are not in a plot");
 				return true;
 			}
-			if (!plot.region().getOwners().getUniqueIds().contains(player.getUniqueId())) {
+			if (!plot.isManager(player) && !player.hasPermission("dipp.admin")) {
 				sender.sendMessage("You are not the owner of this plot");
 				return true;
 			}

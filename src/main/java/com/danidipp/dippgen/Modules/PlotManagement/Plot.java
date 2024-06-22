@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.BooleanFlag;
 import com.sk89q.worldguard.protection.flags.LocationFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -92,7 +93,7 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 			Collection<ProtectedRegion> regions = regionManager.getRegions().values();
 
 			for (var region : regions) {
-				if (!region.getOwners().contains(uuid))
+				if (!region.getOwners().getPlayerDomain().contains(uuid))
 					continue;
 				try {
 					var districtId = region.getId().split("-")[0];
@@ -127,5 +128,10 @@ public record Plot(ProtectedRegion region, @Nullable District district, World wo
 
 	public String getName() {
 		return this.region().getId().split("-")[1];
+	}
+
+	public boolean isManager(Player player) {
+		var wgPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+		return this.region.getOwners().contains(wgPlayer);
 	}
 }

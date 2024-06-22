@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 import com.danidipp.dippgen.Plugin;
 
@@ -36,7 +37,7 @@ public class PlotManagementGUI {
 		}
 	};
 
-	public static int getMemberLimit(OfflinePlayer player) {
+	public static int getMemberLimit(@NotNull OfflinePlayer player) {
 		if (!player.isConnected()) return 1;
 		var maxMembersString = PlaceholderAPI.setPlaceholders(player, "%ms_variable_statPlotFriends%");
 		try {
@@ -48,19 +49,19 @@ public class PlotManagementGUI {
 
 	public static Inventory create(Plot plot, Player player) {
 		var plotName = plot.region().getId().split("-")[1];
-		OfflinePlayer owner = Bukkit.getOfflinePlayer(plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null));
-		var maxMembers = Math.min(getMemberLimit(owner), 5 * 9); // hard limit due to inventory size
+		var maxMembers = Math.min(getMemberLimit(player), 5 * 9); // hard limit due to inventory size
 		var rows = (9 + (1 + maxMembers / 9) * 9);
 		var inventory = Bukkit.createInventory(PlotManagementGUI.plotManagementInventoryHolder, rows,
 				Component.text("Plot Management: " + plotName, NamedTextColor.GOLD));
 		inventory.setItem(0, IconUtil.plotOwner(plot));
 		inventory.setItem(1, IconUtil.plotInfo(plot));
 		// inventory.setItem(7, IconUtil.lockToggle(plot));
-		inventory.setItem(8, IconUtil.abandonPlot(plot));
+		if (plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null) == player.getUniqueId())
+			inventory.setItem(8, IconUtil.abandonPlot(plot));
 
 		var uuids = plot.region().getMembers().getUniqueIds().stream().toList();
 		for (var i = 0; i < uuids.size(); i++) { inventory.setItem(9 + i, IconUtil.memberPortrait(Bukkit.getOfflinePlayer(uuids.get(i)), plot)); }
-		for (var i = uuids.size(); i < getMemberLimit(owner); i++) { inventory.setItem(9 + i, IconUtil.addMember(plot)); }
+		for (var i = uuids.size(); i < getMemberLimit(player); i++) { inventory.setItem(9 + i, IconUtil.addMember(plot)); }
 
 		return inventory;
 	}
@@ -195,7 +196,7 @@ class IconUtil {
 
 		var ownerUUID = plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null);
 		var owner = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : null;
-		var ownerName = owner != null ? owner.getName() : "Not Owned";
+		var ownerName = owner != null ? owner.getName() : "No Owner";
 		var ownedPlots = Plot.getOwnedPlots(ownerUUID);
 		meta.setOwningPlayer(owner);
 
@@ -218,8 +219,8 @@ class IconUtil {
 		var meta = item.getItemMeta();
 
 		var memberCount = plot.region().getMembers().size();
-		var owner = Bukkit.getOfflinePlayer(plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null));
-		var maxMembers = PlotManagementGUI.getMemberLimit(owner);
+		var uuid = plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null);
+		var maxMembers = uuid == null ? 0 : PlotManagementGUI.getMemberLimit(Bukkit.getOfflinePlayer(uuid));
 		//var unlockedFlag = plot.region().getFlag(Plot.plotUnlockedFlag);
 		//var isUnlocked = unlockedFlag != null ? unlockedFlag.booleanValue() : false;
 

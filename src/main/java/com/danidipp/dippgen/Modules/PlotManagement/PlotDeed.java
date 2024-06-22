@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import com.danidipp.dippgen.Plugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -79,6 +80,8 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 			case MANAGEMENT:
 				var ownerName = plot.region().getOwners().getUniqueIds().stream().map(uuid -> Plugin.plugin.getServer().getOfflinePlayer(uuid))
 						.map(OfflinePlayer::getName).collect(Collectors.joining(", "));
+				if (ownerName.isEmpty())
+					ownerName = "n.a.";
 				meta.displayName(Component.text(deed.name + ": " + plot.region().getId().split("-")[1], NamedTextColor.GOLD)
 						.decoration(TextDecoration.ITALIC, false));
 				meta.lore(List.of(
@@ -154,8 +157,9 @@ public record PlotDeed(String name, String firstLore, int getCustomModelData) {
 						player.sendMessage("error: This deed is not for this plot");
 						return;
 					}
-					var isOwner = currentPlot.region().getOwners().contains(player.getUniqueId());
-					var isMember = currentPlot.region().getMembers().contains(player.getUniqueId());
+					var wgPlayer = WorldGuardPlugin.inst().wrapOfflinePlayer(player);
+					var isOwner = currentPlot.region().getOwners().contains(wgPlayer);
+					var isMember = currentPlot.region().getMembers().contains(wgPlayer);
 					if (!isOwner && !isMember) {
 						player.sendMessage("error: You are not a member of this plot");
 						return;

@@ -86,10 +86,21 @@ public class DippExpansion extends PlaceholderExpansion {
                 var districtName = plot.district().name();
                 var plotName = plot.getId().split("-")[1];
                 var plotOwners = plot.region().getOwners().getUniqueIds();
-                var plotOwnersNames = plotOwners.isEmpty() ? null
-                        : plotOwners.stream().map(u -> Plugin.plugin.getServer().getOfflinePlayer(u).getName())
-                                .collect(Collectors.joining(ChatColor.GRAY + ", " + ChatColor.WHITE));
-                var plotOwnerInfo = ChatColor.GRAY + (plotOwnersNames == null ? "unowned" : "owned by " + ChatColor.WHITE + plotOwnersNames);
+                var plotGroups = plot.region().getOwners().getGroups();
+
+                var plotOwnerInfo = "";
+                if (plotOwners.isEmpty() && plotGroups.isEmpty()) {
+                    plotOwnerInfo = ChatColor.GRAY + "unowned";
+                } else {
+                    if (!plotOwners.isEmpty()) {
+                        plotOwnerInfo = ChatColor.GRAY + "owned by " + ChatColor.WHITE
+                                + plotOwners.stream().map(u -> Plugin.plugin.getServer().getOfflinePlayer(u).getName())
+                                        .collect(Collectors.joining(ChatColor.GRAY + ", " + ChatColor.WHITE));
+                    } else {
+                        plotOwnerInfo = ChatColor.GRAY + "maintained by " + ChatColor.WHITE + plotGroups.stream()
+                                .collect(Collectors.joining(ChatColor.GRAY + ", " + ChatColor.WHITE)).toUpperCase();
+                    }
+                }
 
                 return ChatColor.WHITE + plotName + ChatColor.GRAY + " (" + ChatColor.WHITE + districtName + ChatColor.GRAY + ") " + plotOwnerInfo;
             }

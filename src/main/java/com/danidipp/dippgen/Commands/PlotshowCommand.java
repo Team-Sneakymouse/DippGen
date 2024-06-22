@@ -18,6 +18,7 @@ import com.danidipp.dippgen.Plugin;
 import com.danidipp.dippgen.Modules.PlotManagement.Plot;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -75,9 +76,9 @@ public class PlotshowCommand implements ICommandImpl {
 			Collection<ProtectedRegion> regions = regionManager != null ? regionManager.getRegions().values() : List.of();
 
 			// Filter regions by owner
-			var uuid = player.getUniqueId();
-			var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(uuid)).toList();
-			var memberRegions = regions.stream().filter(r -> r.getMembers().contains(uuid)).toList();
+			var wgPlayer = WorldGuardPlugin.inst().wrapOfflinePlayer(player);
+			var ownerRegions = regions.stream().filter(r -> r.getOwners().contains(wgPlayer)).toList();
+			var memberRegions = regions.stream().filter(r -> r.getMembers().contains(wgPlayer)).toList();
 
 			// Display player info
 			var infoComponent = Component.text("[info]", NamedTextColor.YELLOW)
@@ -102,11 +103,17 @@ public class PlotshowCommand implements ICommandImpl {
 					teleportComponent));
 			// Display regions
 			sender.sendMessage(Component.text(player.getName() + " owns " + ownerRegions.size() + " plots:", NamedTextColor.GRAY));
-			for (var region : ownerRegions) { sender.sendMessage(formatRegion(region, world)); }
+			for (var region : ownerRegions) {
+				var indirect = !region.getOwners().getPlayerDomain().contains(wgPlayer);
+				sender.sendMessage(formatRegion(region, world, indirect));
+			}
 
 			if (memberRegions.size() > 0) {
 				sender.sendMessage(Component.text(player.getName() + " is a member of " + memberRegions.size() + " plots:", NamedTextColor.GRAY));
-				for (var region : memberRegions) { sender.sendMessage(formatRegion(region, world, true)); }
+				for (var region : memberRegions) {
+					var indirect = !region.getMembers().contains(wgPlayer);
+					sender.sendMessage(formatRegion(region, world, indirect, true));
+				}
 			}
 
 			return true;
@@ -114,10 +121,14 @@ public class PlotshowCommand implements ICommandImpl {
 	}
 
 	Component formatRegion(ProtectedRegion region, World world) {
-		return formatRegion(region, world, false);
+		return formatRegion(region, world, false, false);
 	}
 
-	Component formatRegion(ProtectedRegion region, World world, boolean showOwner) {
+	Component formatRegion(ProtectedRegion region, World world, boolean indirect) {
+		return formatRegion(region, world, indirect, false);
+	}
+
+	Component formatRegion(ProtectedRegion region, World world, boolean indirect, boolean showOwner) {
 		var regionCenter = region.getMinimumPoint().add(region.getMaximumPoint()).divide(2);
 		var centerY = region.getMaximumPoint().getBlockY();
 		while (world.getBlockAt(regionCenter.getBlockX(), centerY, regionCenter.getBlockZ()).isPassable()) { centerY--; }
@@ -140,8 +151,14 @@ public class PlotshowCommand implements ICommandImpl {
 
 		var ownerName = region.getOwners().getUniqueIds().stream().map(Bukkit::getOfflinePlayer).map(OfflinePlayer::getName).findFirst()
 				.orElse("Unknown");
-		var regionName = showOwner ? Component.text(ownerName + "'s plot", NamedTextColor.WHITE)
-				.hoverEvent(HoverEvent.showText(Component.text(region.getId()))) : Component.text(region.getId(), NamedTextColor.WHITE);
+		var regionName = Component.text(region.getId(), NamedTextColor.WHITE);
+		if (showOwner) {
+			regionName = Component.text(ownerName + "'s plot", NamedTextColor.WHITE)
+					.hoverEvent(HoverEvent.showText(Component.text(region.getId())));
+		}
+		if (indirect) {
+			regionName = regionName.color(NamedTextColor.GRAY).hoverEvent(HoverEvent.showText(Component.text("via group")));
+		}
 		var text = Component.textOfChildren(
 				Component.text("- "),
 				regionName, Component.space(),
