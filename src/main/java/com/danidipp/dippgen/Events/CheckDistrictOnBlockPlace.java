@@ -8,11 +8,14 @@ import javax.annotation.Nullable;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
@@ -25,36 +28,56 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 public class CheckDistrictOnBlockPlace implements Listener {
-	static boolean canPlace(Player player, Location location, Material material) {
+	enum CheckAction {
+		PLACE, BREAK, INTERACT, INTERACT_ENTITY
+	}
+
+	public static boolean canDo(CheckAction action, Player player, Location location, Material material) {
+		return canDo(action.toString().toLowerCase(), player, location, material.name().toLowerCase());
+	}
+
+	public static boolean canDo(CheckAction action, Player player, Location location, EntityType entityType) {
+		return canDo(action.toString().toLowerCase(), player, location, entityType.name().toLowerCase());
+	}
+
+	private static boolean canDo(String action, Player player, Location location, String thing) {
 		if (player.hasPermission("dipp.admin"))
 			return true;
-		var exceptionPermission = "dipp.exception.place." + material.name().toLowerCase();
-		if (player.getEffectivePermissions().stream().anyMatch(p -> p.getPermission().equals(exceptionPermission))) {
-			if (player.hasPermission(exceptionPermission)) {
-				debugLog(player, null, exceptionPermission);
+
+		// Check for explicit personal exceptions
+		var exceptionName = "dipp.exception." + action + "." + thing;
+		var exceptionPerm = player.getEffectivePermissions().stream().filter(p -> p.getPermission().equals(exceptionName)).findFirst();
+		if (exceptionPerm.isPresent()) {
+			if (exceptionPerm.get().getValue()) {
+				// explicit allow
+				debugLog(player, null, exceptionName);
 				return true;
 			} else {
-				debugLog(player, NamedTextColor.RED, "[PLACE] Explicit exception override: " + exceptionPermission);
+				// explicit deny
+				debugLog(player, NamedTextColor.RED, "[" + action.toUpperCase() + "] Explicit exception override: " + exceptionName);
 				return false;
 			}
 		}
 
+		// Check for region permissions
 		var regions = getRegions(location);
 		if (regions.size() == 0) {
-			debugLog(player, NamedTextColor.RED, "[PLACE] No regions found.");
-			return false;
+			debugLog(player, NamedTextColor.RED, "[" + action.toUpperCase() + "] No regions found.");
+			return false; // Outside the city
 		}
+
 		var topRegion = regions.get(0);
 		var topRegionIsolatePermission = "dipp." + topRegion.getId() + ".isolate";
-		if (topRegion.getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
+		var isPlot = topRegion.getPriority() == 5;
+		if (!isPlot && !player.hasPermission(topRegionIsolatePermission)) {
 			// Player is not in a plot
-			debugLog(player, NamedTextColor.RED, "[PLACE] Region " + topRegion.getId() + " is not isolated.");
+			debugLog(player, NamedTextColor.RED, "[" + action.toUpperCase() + "] Region " + topRegion.getId() + " is not isolated.");
 			return false;
 		}
 
 		var checkedRegions = new ArrayList<String>();
 		for (var region : regions) {
-			var permission = "dipp." + region.getId() + ".place." + material.name().toLowerCase();
+			var permission = "dipp." + region.getId() + "." + action + "." + thing;
 			if (player.hasPermission(permission)) { // allow event to go through
 				debugLog(player, null, permission);
 				return true;
@@ -62,73 +85,43 @@ public class CheckDistrictOnBlockPlace implements Listener {
 			checkedRegions.add(region.getId());
 
 			var isolatedPermission = "dipp." + region.getId() + ".isolate";
-			if (player.hasPermission(isolatedPermission) && topRegion.getPriority() != 5) {
+			if (player.hasPermission(isolatedPermission) && !isPlot) {
 				break;
 			}
 		}
 
-		debugLog(player, NamedTextColor.RED, "[PLACE] No permission to place " + material.name() + " in " + String.join(",", checkedRegions));
+		debugLog(player, NamedTextColor.RED,
+				"[" + action.toUpperCase() + "] No permission to " + action + " " + thing + " in " + String.join(",", checkedRegions));
 		return false;
 	}
 
 	@EventHandler
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
-		if (!canPlace(event.getPlayer(), event.getBlock().getLocation(), event.getBlockPlaced().getType()))
+		if (!canDo(
+				CheckAction.PLACE.toString().toLowerCase(),
+				event.getPlayer(),
+				event.getBlock().getLocation(),
+				event.getBlockPlaced().getType().name().toLowerCase()))
 			event.setCancelled(true);
 	}
 
 	@EventHandler
 	public void onBlockBreakEvent(BlockBreakEvent event) {
-		Player player = event.getPlayer();
-		if (player.hasPermission("dipp.admin"))
-			return;
-		var exceptionPermission = "dipp.exception.break." + event.getBlock().getType().name().toLowerCase();
-		if (player.getEffectivePermissions().stream().anyMatch(p -> p.getPermission().equals(exceptionPermission))) {
-			if (player.hasPermission(exceptionPermission)) {
-				if (player.hasPermission("dipp.debug")) {
-					player.sendActionBar(Component.text(exceptionPermission));
-				}
-				return;
-			} else {
-				debugLog(player, NamedTextColor.RED, "[BREAK] Explicit exception override: " + exceptionPermission);
-				event.setCancelled(true);
-				return;
-			}
-		}
-
-		var regions = getRegions(event.getBlock().getLocation());
-		if (regions.size() == 0) {
-			debugLog(player, NamedTextColor.RED, "[BREAK] No regions found.");
+		if (!canDo(CheckAction.BREAK, event.getPlayer(), event.getBlock().getLocation(), event.getBlock().getType()))
 			event.setCancelled(true);
-			return;
-		}
-		var topRegion = regions.get(0);
-		var topRegionIsolatePermission = "dipp." + topRegion.getId() + ".isolate";
-		if (topRegion.getPriority() != 5 && !player.hasPermission(topRegionIsolatePermission)) {
-			// Player is not in a plot
-			debugLog(player, NamedTextColor.RED, "[BREAK] Region " + topRegion.getId() + " is not isolated.");
-			event.setCancelled(true);
-			return;
-		}
-
-		var checkedRegions = new ArrayList<String>();
-		for (var region : regions) {
-			var permission = "dipp." + region.getId() + ".break." + event.getBlock().getType().name().toLowerCase();
-			if (player.hasPermission(permission)) { // allow event to go through
-				debugLog(player, null, permission);
-				return;
-			}
-			checkedRegions.add(region.getId());
-
-			var isolatedPermission = "dipp." + region.getId() + ".isolate";
-			if (player.hasPermission(isolatedPermission) && topRegion.getPriority() != 5) {
-				break;
-			}
-		}
-		debugLog(player, NamedTextColor.RED,
-				"[BREAK] No permission to break " + event.getBlock().getType().name() + " in " + String.join(",", checkedRegions));
-		event.setCancelled(true);
 	}
+
+	// @EventHandler
+	// public void onInteract(PlayerInteractEvent event) {
+	// 	if (!canDo(CheckAction.INTERACT, event.getPlayer(), event.getClickedBlock().getLocation(), event.getClickedBlock().getType()))
+	// 		event.setCancelled(true);
+	// }
+
+	// @EventHandler
+	// public void onInteractEntity(PlayerInteractEntityEvent event) {
+	// 	if (!canDo(CheckAction.INTERACT_ENTITY, event.getPlayer(), event.getRightClicked().getLocation(), event.getRightClicked().getType()))
+	// 		event.setCancelled(true);
+	// }
 
 	static List<ProtectedRegion> getRegions(Location location) {
 		var wgLocation = BukkitAdapter.adapt(location);

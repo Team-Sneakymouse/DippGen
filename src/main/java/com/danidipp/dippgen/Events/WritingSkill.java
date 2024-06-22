@@ -7,6 +7,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import com.danidipp.dippgen.Events.CheckDistrictOnBlockPlace.CheckAction;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -74,7 +75,8 @@ public class WritingSkill implements Listener {
 		var wgLocation = BukkitAdapter.adapt(event.getClickedBlock().getLocation());
 
 		if (!query.testState(wgLocation, wgPlayer, Flags.BUILD)
-				|| !CheckDistrictOnBlockPlace.canPlace(player, event.getClickedBlock().getLocation(), event.getClickedBlock().getType())) {
+				|| !CheckDistrictOnBlockPlace.canDo(CheckAction.PLACE, player, event.getClickedBlock().getLocation(),
+						event.getClickedBlock().getType())) {
 			event.setCancelled(true);
 		}
 	}
