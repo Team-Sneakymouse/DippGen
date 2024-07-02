@@ -56,12 +56,17 @@ public class PlotManagementGUI {
 		inventory.setItem(0, IconUtil.plotOwner(plot));
 		inventory.setItem(1, IconUtil.plotInfo(plot));
 		// inventory.setItem(7, IconUtil.lockToggle(plot));
-		if (plot.region().getOwners().getUniqueIds().stream().findFirst().orElse(null) == player.getUniqueId())
-			inventory.setItem(8, IconUtil.abandonPlot(plot));
+		var isOwner = plot.region().getOwners().getUniqueIds().contains(player.getUniqueId());
+		if (isOwner) inventory.setItem(8, IconUtil.abandonPlot(plot));
 
 		var uuids = plot.region().getMembers().getUniqueIds().stream().toList();
-		for (var i = 0; i < uuids.size(); i++) { inventory.setItem(9 + i, IconUtil.memberPortrait(Bukkit.getOfflinePlayer(uuids.get(i)), plot)); }
-		for (var i = uuids.size(); i < getMemberLimit(player); i++) { inventory.setItem(9 + i, IconUtil.addMember(plot)); }
+		for (var i = 0; i < uuids.size(); i++) {
+			inventory.setItem(9 + i, IconUtil.memberPortrait(Bukkit.getOfflinePlayer(uuids.get(i)), plot, isOwner));
+		}
+		if (plot.isManager(player))
+			for (var i = uuids.size(); i < getMemberLimit(player); i++) {
+				inventory.setItem(9 + i, IconUtil.addMember(plot));
+			}
 
 		return inventory;
 	}
@@ -79,32 +84,39 @@ public class PlotManagementGUI {
 					|| event.getCurrentItem() == null)
 				return;
 
+			if (!(event.getWhoClicked() instanceof Player)) {
+				event.getWhoClicked().sendMessage("what are you??");
+				return;
+			}
+
 			var item = event.getCurrentItem();
 			var slot = event.getSlot();
+			var player = (Player) event.getWhoClicked();
 
 			String plotId = item.getItemMeta().getPersistentDataContainer().get(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING);
 			Plot plot = Plot.getPlot(plotId);
 			if (plot == null) {
-				event.getWhoClicked().sendMessage("error: Plot \"" + plotId + "\" not found. Please tell Dani!");
+				player.sendMessage("error: Plot \"" + plotId + "\" not found. Please tell Dani!");
 				Bukkit.getScheduler().runTask(Plugin.plugin, () -> event.getView().close());
 				return;
 			}
 
+			var isOwner = plot.region().getOwners().getUniqueIds().contains(player.getUniqueId());
+			var isManager = plot.isManager(player);
 			// if (slot == 7) {
 			// 	this.toggleLock(event, plot);
 			// 	return;
 			// }
 			if (slot == 8) {
-				this.abandonPlot(event, plot);
+				if (isOwner) this.abandonPlot(event, plot);
 				return;
 			}
 			if (item.getType() == Material.PLAYER_HEAD && slot >= 9) {
-				Plugin.plugin.getLogger().info("remove member");
-				this.removeMember(event, plot);
+				if (isManager) this.removeMember(event, plot);
 				return;
 			}
 			if (item.getType() == Material.GREEN_STAINED_GLASS_PANE) {
-				this.addMember(event, plot);
+				if (isManager) this.addMember(event, plot);
 				return;
 			}
 		}
@@ -119,10 +131,6 @@ public class PlotManagementGUI {
 		// }
 
 		void abandonPlot(InventoryClickEvent event, Plot plot) {
-			if (!(event.getWhoClicked() instanceof Player)) {
-				event.getWhoClicked().sendMessage("what are you??");
-				return;
-			}
 			var player = (Player) event.getWhoClicked();
 
 			plot.region().getMembers().removeAll();
@@ -286,7 +294,7 @@ class IconUtil {
 		return item;
 	}
 
-	static ItemStack memberPortrait(OfflinePlayer player, Plot plot) {
+	static ItemStack memberPortrait(OfflinePlayer player, Plot plot, boolean isOwner) {
 		var item = new ItemStack(Material.PLAYER_HEAD);
 		var meta = (SkullMeta) item.getItemMeta();
 
@@ -294,14 +302,15 @@ class IconUtil {
 			meta.setOwningPlayer(player);
 		}
 		meta.displayName(Component.text(player.getName(), NamedTextColor.GOLD).decoration(TextDecoration.ITALIC, false));
-		var loreComponents = List.of(
-				Component.text("Click to remove them from the plot", NamedTextColor.YELLOW),
-				Component.text("Additional member slots can be", NamedTextColor.GRAY),
-				Component.text("acquired from Skill Trees", NamedTextColor.GRAY));
-		loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
-		meta.lore(loreComponents);
+		if (isOwner) {
+			var loreComponents = List.of(
+					Component.text("Click to remove them from the plot", NamedTextColor.YELLOW),
+					Component.text("Additional member slots can be", NamedTextColor.GRAY),
+					Component.text("acquired from Skill Trees", NamedTextColor.GRAY));
+			loreComponents = loreComponents.stream().map(component -> component.decoration(TextDecoration.ITALIC, false)).toList();
+			meta.lore(loreComponents);
+		}
 		meta.getPersistentDataContainer().set(PlotDeed.PLOT_ID_KEY, PersistentDataType.STRING, plot.getId());
-
 		item.setItemMeta(meta);
 		return item;
 	}
