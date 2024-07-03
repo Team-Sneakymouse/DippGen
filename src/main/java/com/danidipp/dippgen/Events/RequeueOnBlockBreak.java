@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected;
 
@@ -27,9 +28,12 @@ public class RequeueOnBlockBreak implements Listener {
     void onBlockBreakEvent(BlockBreakEvent event) {
         // Bukkit.broadcastMessage("BlockBreakEvent " + event.getBlock().getType().name());
         if (event.isCancelled()) return;
+
         var isTopHalf = event.getBlock().getBlockData() instanceof Bisected
                 && ((Bisected) event.getBlock().getBlockData()).getHalf() == Bisected.Half.TOP;
         var eventLocation = isTopHalf ? event.getBlock().getRelative(BlockFace.DOWN).getLocation() : event.getBlock().getLocation();
+        var magicspellsMarker = eventLocation.getBlock().getRelative(0, 200, 0).getType() == Material.BARRIER;
+        if (magicspellsMarker) return; // created by MagicSpells - don't schedule replace
 
         for (var replacement : Plugin.plugin.replacements) {
             var matchesLocation = replacement.locations().stream().anyMatch(l -> l.equals(eventLocation));
@@ -38,7 +42,7 @@ public class RequeueOnBlockBreak implements Listener {
                             eventLocation.getBlockZ()))
                     && replacement.blocks().stream().anyMatch(b -> b.material().equals(eventLocation.getBlock().getType()))
                     && Plot.getPlot(eventLocation) == null;
-            if (matchesLocation || matchesRegion) {
+            if ((matchesLocation || matchesRegion)) {
                 // Bukkit.broadcastMessage("Location match: " + eventLocation);
                 var min = replacement.minDelay();
                 var max = replacement.maxDelay();
