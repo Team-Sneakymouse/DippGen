@@ -43,3 +43,7 @@ commands:
         description: Toggles autopickup
         permission: dipp.commands.autopickup
         usage: /<command> <player> [duration]
+    kobold:
+        description: Speak in kobold
+        aliases: [ko]
+        usage: /<command> <message>
