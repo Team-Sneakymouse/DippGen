@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://json.schemastore.org/bukkit-plugin
+name: dippgen
+main: com.danidipp.dippgen.Plugin
+version: 1.0
+api-version: 1.20
+depend:
+    - WorldGuard
+softdepend:
+    - PlaceholderAPI
+
+commands:
+    reload:
+        description: Reloads config
+        permission: dipp.commands.reload
+        usage: /<command>
+    plot:
+        description: Open plot management GUI for player
+        permission: dipp.commands.plot
+        usage: /<command> <player>
+    showbook:
+        description: shows book - not to be used manually
+        usage: /<command> <hashcode>
+    plotshow:
+        description: Displays info of plot you're standong on, or specific player
+        permission: dipp.commands.plotshow
+        usage: /<command> [player]
+    plotchests:
+        description: Displays chests and storage within plot
+        permission: dipp.commands.plotchests
+        usage: /<command> <plot>
+    opencontainer:
+        description: Opens container at coordinates
+        permission: dipp.commands.opencontainer
+        usage: /<command> <world> <x> <y> <z>
+    deed:
+        description: Give deed of current plot to player
+        usage: /<command>
+    homestone:
+        description: Opens homestone management GUI for player
+        permission: dipp.commands.homestone
+        usage: /<command> <player>
+    homestonedestination:
+        description: Updates homestone teleport destination for current plot
+        permission: dipp.commands.homestonedestination
+        usage: /<command> <player>
+    autopickup:
+        description: Toggles autopickup
+        permission: dipp.commands.autopickup
+        usage: /<command> <player> [duration]
+    info:
+        description: Displays info of player or plot
+        permission: dipp.commands.info
+        usage: /<command> [player]
+    kobold:
+        description: Speak in kobold
+        aliases: [ko]
+        usage: /<command> <message>
+    cratecheck:
+        description: Check if a player's crate is full
+        permission: dipp.commands.cratecheck
+        usage: /<command> <player>
+    cmi_give:
+        description: Replaces spaces in argument with underscores before invoking /cmi give
+        permission: dipp.commands.cmi_give
+        usage: /<command> <player> <args>
