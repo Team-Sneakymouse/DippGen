@@ -18,7 +18,6 @@ dependencies {
         exclude(group = "org.bstats", module = "bstats-bukkit")
     }
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly(files("lib/CMILib1.5.3.4.jar"))
 }
 
 kotlin {

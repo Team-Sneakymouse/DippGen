@@ -55,10 +55,6 @@ commands:
         description: Speak in kobold
         aliases: [ko]
         usage: /<command> <message>
-    cratecheck:
-        description: Check if a player's crate is full
-        permission: dipp.commands.cratecheck
-        usage: /<command> <player>
     cmi_give:
         description: Replaces spaces in argument with underscores before invoking /cmi give
         permission: dipp.commands.cmi_give

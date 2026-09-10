@@ -4,8 +4,6 @@ import com.danidipp.dippgen.Commands.InfoCommand
 import com.danidipp.dippgen.Commands.KoboldCommand
 import com.danidipp.dippgen.Events.BreedAnimalsFlag
 import com.danidipp.dippgen.Events.Chat
-import com.danidipp.dippgen.Modules.Crates.Crate
-import com.danidipp.dippgen.Modules.Crates.CrateGUI
 import com.danidipp.dippgen.Modules.PlotManagement.Plot
 import com.danidipp.dippgen.Modules.PlotManagement.PlotClaimGUI
 import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed
@@ -73,10 +71,7 @@ class Plugin : JavaPlugin() {
         server.pluginManager.registerEvents(PlotClaimGUI.listener, this)
         server.pluginManager.registerEvents(PlotManagementGUI.listener, this)
         server.pluginManager.registerEvents(KoboldCommand.listener, this)
-        server.pluginManager.registerEvents(Crate.listener, this)
-        server.pluginManager.registerEvents(CrateGUI.listener, this)
-        CrateGUI.registerExternalEvents()
-        count += 6
+        count += 4
         logger.info("Registered $count events")
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
