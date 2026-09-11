@@ -1,9 +1,7 @@
 package com.danidipp.dippgen
 
 import com.danidipp.dippgen.Commands.InfoCommand
-import com.danidipp.dippgen.Commands.KoboldCommand
 import com.danidipp.dippgen.Events.BreedAnimalsFlag
-import com.danidipp.dippgen.Events.Chat
 import com.danidipp.dippgen.Modules.PlotManagement.Plot
 import com.danidipp.dippgen.Modules.PlotManagement.PlotClaimGUI
 import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed
@@ -39,7 +37,6 @@ class Plugin : JavaPlugin() {
             flagRegistry.register(Plot.plotUnlockedFlag)
             flagRegistry.register(Plot.teleportLocationFlag)
             flagRegistry.register(BreedAnimalsFlag.breedAnimalsFlag)
-            flagRegistry.register(Chat.chatFlag)
         }.onFailure {
             logger.warning("Failed to register one or more WorldGuard flags: ${it.message}")
         }
@@ -70,8 +67,7 @@ class Plugin : JavaPlugin() {
         server.pluginManager.registerEvents(PlotDeed.listener, this)
         server.pluginManager.registerEvents(PlotClaimGUI.listener, this)
         server.pluginManager.registerEvents(PlotManagementGUI.listener, this)
-        server.pluginManager.registerEvents(KoboldCommand.listener, this)
-        count += 4
+        count += 3
         logger.info("Registered $count events")
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {

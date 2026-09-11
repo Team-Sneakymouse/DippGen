@@ -51,10 +51,6 @@ commands:
         description: Displays info of player or plot
         permission: dipp.commands.info
         usage: /<command> [player]
-    kobold:
-        description: Speak in kobold
-        aliases: [ko]
-        usage: /<command> <message>
     cmi_give:
         description: Replaces spaces in argument with underscores before invoking /cmi give
         permission: dipp.commands.cmi_give
