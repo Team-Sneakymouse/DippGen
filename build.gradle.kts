@@ -68,6 +68,7 @@ publishing {
                 name.set("DippGen")
                 description.set("Paper plugin for plot management and server utilities.")
                 url.set("https://github.com/Team-Sneakymouse/DippGen")
+                properties.put("sneakyrp.deployment.type", "paper-plugin")
                 scm {
                     url.set("https://github.com/Team-Sneakymouse/DippGen")
                     connection.set("scm:git:https://github.com/Team-Sneakymouse/DippGen.git")
