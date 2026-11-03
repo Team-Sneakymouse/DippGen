@@ -55,3 +55,7 @@ commands:
         description: Replaces spaces in argument with underscores before invoking /cmi give
         permission: dipp.commands.cmi_give
         usage: /<command> <player> <args>
+    dippdebug:
+        description: Toggles permission debug messages until you log out
+        permission: dipp.commands.dippdebug
+        usage: /<command>

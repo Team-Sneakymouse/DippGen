@@ -1,5 +1,6 @@
 package com.danidipp.dippgen.Events
 
+import com.danidipp.dippgen.DebugMode
 import com.danidipp.dippgen.Modules.PlotManagement.Plot
 import com.sk89q.worldedit.bukkit.BukkitAdapter
 import com.sk89q.worldguard.WorldGuard
@@ -116,7 +117,7 @@ class CheckDistrictOnBlockPlace : Listener {
         }
 
         private fun debugLog(player: Player, color: TextColor?, message: String) {
-            if (!player.hasPermission("dipp.debug")) {
+            if (!DebugMode.isEnabled(player.uniqueId)) {
                 return
             }
 
