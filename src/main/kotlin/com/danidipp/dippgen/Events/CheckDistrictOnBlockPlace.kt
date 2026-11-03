@@ -184,7 +184,7 @@ class CheckDistrictOnBlockPlace : Listener {
         val material = clickedBlock.type
         val isInteractable = material.isInteractable && !Tag.STAIRS.isTagged(material) && !Tag.FENCES.isTagged(material)
         if (!isInteractable) {
-            if (event.player.hasPermission("dipp.debug.extra")) {
+            if (DebugMode.isEnabled(event.player.uniqueId)) {
                 event.player.sendMessage(Component.text("Not interactable: $material", NamedTextColor.GRAY))
             }
             return
