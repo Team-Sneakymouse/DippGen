@@ -14,7 +14,7 @@ replacements:
     regions: []
   global_flowers:
     blocks:
-      - material: GRASS
+      - material: SHORT_GRASS
         weight: 2
       - material: FERN
         weight: 3

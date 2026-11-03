@@ -2,7 +2,7 @@
 name: dippgen
 main: com.danidipp.dippgen.Plugin
 version: ${version}
-api-version: 1.20
+api-version: "26.2"
 depend:
     - WorldGuard
 softdepend:
