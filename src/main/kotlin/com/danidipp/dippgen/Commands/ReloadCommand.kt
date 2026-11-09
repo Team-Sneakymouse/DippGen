@@ -9,7 +9,6 @@ class ReloadCommand : ICommandImpl {
 
     override val executor: CommandExecutor = CommandExecutor { _, _, _, _ ->
         Plugin.plugin.reloadConfig()
-        Plugin.plugin.parseConfig()
         true
     }
 

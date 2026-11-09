@@ -1,8 +1,12 @@
 # DippGen
 
-Paper plugin for Lords of Minecraft: WorldGuard plot management (claiming, deeds, members, plot chests), homestones, timed block replacement, autopickup, book spying and other server utilities.
+Paper plugin for Lords of Minecraft: autopickup, book spying, join/RDM monitors and other server utilities.
 
-Requires **WorldGuard** on the server; **PlaceholderAPI** is optional (registers the `dipp` expansion).
+Plots, build protection (claiming, members, deeds, homestones, `dipp.plot/nonplot/region.*` permissions), the
+`%dipp_...%` placeholders and timed block replacement were removed. Plots
+are replaced by [SneakyPlots](https://github.com/Team-Sneakymouse/SneakyPlots).
+
+Requires **WorldGuard** on the server; **PlaceholderAPI** is optional (CMI playtime in the join and RDM monitors).
 
 ## Development
 

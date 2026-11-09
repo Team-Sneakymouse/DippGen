@@ -43,9 +43,8 @@ class WritingSkill : Listener {
 
         val query = WorldGuard.getInstance().platform.regionContainer.createQuery()
         val wgLocation: WgLocation = BukkitAdapter.adapt(clickedBlock.location)
-        if (!query.testState(wgLocation, wgPlayer, Flags.BUILD) ||
-            !CheckDistrictOnBlockPlace.canDo(CheckDistrictOnBlockPlace.CheckAction.PLACE, player, clickedBlock.location, clickedBlock.type)
-        ) {
+        // Plot/zone build rules for sign editing are enforced by SneakyPlots (interact on the sign).
+        if (!query.testState(wgLocation, wgPlayer, Flags.BUILD)) {
             event.isCancelled = true
         }
     }

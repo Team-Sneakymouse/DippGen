@@ -130,7 +130,7 @@ publishing {
             from(components["java"])
             pom {
                 name.set("DippGen")
-                description.set("Paper plugin for plot management and server utilities.")
+                description.set("Paper plugin for Lords of Minecraft server utilities.")
                 url.set("https://github.com/Team-Sneakymouse/DippGen")
                 properties.put("sneakyrp.deployment.type", "paper-plugin")
                 developers {

@@ -1,6 +1,6 @@
 # Agent instructions (Team Sneakymouse / Lords of Minecraft)
 
-This repo is the **DippGen** Paper plugin (Kotlin, Paper 26.2, Gradle): WorldGuard plot management, homestones, block replacement and assorted server utilities. All coding agents (Cursor, Claude Code, Codex, Antigravity, Hermes, etc.) should follow this file.
+This repo is the **DippGen** Paper plugin (Kotlin, Paper 26.2, Gradle): assorted server utilities. Plots and build protection moved to SneakyPlots. All coding agents (Cursor, Claude Code, Codex, Antigravity, Hermes, etc.) should follow this file.
 
 <!-- BEGIN TEAM-POLICY MANAGED BOOTSTRAP -->
 This project is enrolled in Team-Sneakymouse development policy via a sibling checkout (see `.team-policy/pointer.json`).
@@ -46,7 +46,6 @@ src/main/kotlin/com/danidipp/dippgen/
   AutoRegistrar.kt           # Reflection-based command/listener registration
   Commands/                  # ICommandImpl per command; name must be declared in plugin.yml
   Events/                    # Listeners, auto-registered
-  Modules/PlotManagement/    # Plot/district logic and GUIs
 src/test/kotlin/com/danidipp/dippgen/   # JUnit 5 tests
 ```
 

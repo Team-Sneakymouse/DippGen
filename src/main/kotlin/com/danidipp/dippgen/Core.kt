@@ -2,11 +2,9 @@ package com.danidipp.dippgen
 
 import com.danidipp.dippgen.Commands.InfoCommand
 import com.danidipp.dippgen.Events.BreedAnimalsFlag
-import com.danidipp.dippgen.Modules.PlotManagement.Plot
-import com.danidipp.dippgen.Modules.PlotManagement.PlotClaimGUI
-import com.danidipp.dippgen.Modules.PlotManagement.PlotDeed
-import com.danidipp.dippgen.Modules.PlotManagement.PlotManagementGUI
 import com.sk89q.worldguard.WorldGuard
+import com.sk89q.worldguard.protection.flags.BooleanFlag
+import com.sk89q.worldguard.protection.flags.LocationFlag
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -25,8 +23,6 @@ class Plugin : JavaPlugin() {
             .append(Component.text("] ", NamedTextColor.GRAY))
     }
 
-    var replacements: MutableList<Replacement> = mutableListOf()
-    var replacementRegistrationEnabled: MutableMap<Player, String> = mutableMapOf()
     var recentBooks: MutableMap<String, BookMeta> = mutableMapOf()
     var autoPickup: MutableMap<Player, ScheduledTask> = mutableMapOf()
 
@@ -34,8 +30,10 @@ class Plugin : JavaPlugin() {
         logger.info("Plugin is Loading!")
         val flagRegistry = WorldGuard.getInstance().flagRegistry
         runCatching {
-            flagRegistry.register(Plot.plotUnlockedFlag)
-            flagRegistry.register(Plot.teleportLocationFlag)
+            // Plot flags from the old plot management, kept so WorldGuard preserves this data in regions.yml
+            // until SneakyPlots has imported it (/plots import worldguard). Remove after the migration.
+            flagRegistry.register(BooleanFlag("plot-unlocked"))
+            flagRegistry.register(LocationFlag("teleport-location"))
             flagRegistry.register(BreedAnimalsFlag.breedAnimalsFlag)
         }.onFailure {
             logger.warning("Failed to register one or more WorldGuard flags: ${it.message}")
@@ -44,13 +42,10 @@ class Plugin : JavaPlugin() {
 
     override fun onEnable() {
         plugin = this
-        replacementRegistrationEnabled = mutableMapOf()
         recentBooks = mutableMapOf()
         autoPickup = mutableMapOf()
 
         logger.info("Plugin is Starting!")
-        parseConfig()
-        logger.info("Config Loaded!")
 
         var count = AutoRegistrar.registerCommands(this)
         logger.info("Registered $count commands/listeners")
@@ -64,37 +59,12 @@ class Plugin : JavaPlugin() {
         }, 1L)
 
         count = AutoRegistrar.registerEvents(this)
-        server.pluginManager.registerEvents(PlotDeed.listener, this)
-        server.pluginManager.registerEvents(PlotClaimGUI.listener, this)
-        server.pluginManager.registerEvents(PlotManagementGUI.listener, this)
-        count += 3
         logger.info("Registered $count events")
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            DippExpansion(this).register()
-        }
-        logger.info("Registered placeholders")
-
-        Bukkit.getScheduler().runTaskLater(this, Runnable {
-            replacements.forEach { replacement ->
-                Bukkit.getScheduler().runTaskLater(this, Runnable {
-                    replacement.locations.forEach { replacement.placeBlock(it.block) }
-                    if (replacement.regions.isNotEmpty()) {
-                        replacement.locations.clear()
-                        config.set("replacements.${replacement.name}", replacement.toMap())
-                        saveConfig()
-                    }
-                }, 1L)
-            }
-        }, 1L)
     }
 
     override fun onDisable() {
         logger.info("Plugin is Disabling!")
-    }
-
-    fun parseConfig() {
-        replacements = ReplacementConfigParser.parse(this)
     }
 
     fun sendDiscord(message: String) {
