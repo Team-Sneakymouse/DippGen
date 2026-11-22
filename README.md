@@ -25,7 +25,7 @@ Coding agents follow [AGENTS.md](./AGENTS.md).
 
 ## Publishing
 
-Every push to `main` publishes `io.github.team-sneakymouse:dippgen:<version>` to `https://maven.sneakyrp.com/releases`
+Every push to `main` publishes `io.github.team-sneakymouse:dippgen:<version>` to `https://maven.sneakyrp.com/sneakymouse`
 through the shared [`Team-Sneakymouse/ci`](https://github.com/Team-Sneakymouse/ci) workflow
 (`.github/workflows/publish.yml`). Pull requests are built and tested by `.github/workflows/ci.yml`.
 The repository must be allowlisted for Infisical OIDC; private repositories also need the
