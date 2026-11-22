@@ -16,10 +16,6 @@ commands:
     showbook:
         description: shows book - not to be used manually
         usage: /<command> <hashcode>
-    opencontainer:
-        description: Opens container at coordinates
-        permission: dipp.commands.opencontainer
-        usage: /<command> <world> <x> <y> <z>
     autopickup:
         description: Toggles autopickup
         permission: dipp.commands.autopickup
